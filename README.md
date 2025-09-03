@@ -1,18 +1,35 @@
 # Overview
 
-Speed test of various JVM regex libraries.   Following in the tradition of [tusker.org](https://web.archive.org/web/20221205160707/https://tusker.org/regex/regex_benchmark.html) and 
-the [regex-libraries-benchmark](https://github.com/gpanther/regex-libraries-benchmarks), this is a effort to benchmark as many non-orphaned libraries as I could find.
+Speed test of various JVM regex libraries.  Following in the tradition
+of
+[tusker.org](https://web.archive.org/web/20221205160707/https://tusker.org/regex/regex_benchmark.html)
+and the
+[regex-libraries-benchmark](https://github.com/gpanther/regex-libraries-benchmarks),
+this is a effort to benchmark as many non-orphaned libraries as I
+could find.
 
 # Implementation types
-There are 3 main implementation approaches:   backtracking NFA, non-backtracking NFA and DFA.  They have very different performance characteristics in terms of the length of the pattern (`M`) and the length of the text (`N`). 
+There are 3 main implementation approaches: backtracking NFA,
+non-backtracking NFA and DFA.  They have very different performance
+characteristics in terms of the length of the pattern (`M`) and the
+length of the text (`N`).
 
-Backtracking NFAs, aka Perl-style,  have all the familiar features and compilation is very quick.  They can support a rich set of boundary conditions as well as back-references and submatches.  Execution, while good in many common cases, is `O(2ᴺ)` in some not very remote corner cases. 
+Backtracking NFAs, aka Perl-style, have all the familiar features and
+compilation is very quick.  They can support a rich set of boundary
+conditions as well as back-references and submatches.  Execution,
+while good in many common cases, is `O(2ᴺ)` in some not very remote
+corner cases.
 
 DFAs, aka grep-style, are the headline implementation in compiler classes.  Execution is always a fast `O(N)`.   However, compilation can be `O(2ᴹ)` in space and time in corner cases.   These do not support submatches, boundary conditions or back-references.  
 
-Non-backtracking NFAs, aka Thompson's construction, combine good execution time: `O(NM)` with good compilation `O(M)`.  Support for submatches and simple boundary conditions is included. 
+Non-backtracking NFAs, aka Thompson's construction, combine good
+execution time: `O(NM)` with good compilation `O(M)`.  Support for
+submatches and simple boundary conditions is included.
 
-The DFAs use POSIX style ambiguity resolution: they return the leftmost/longest match.  The NFAs are more complicated:  `a|b|ab` is not the same as `ab|a|b`.  When matched against "ab" the first returns "a","b" and the second "ab". 
+The DFAs use POSIX style ambiguity resolution: they return the
+leftmost/longest match.  The NFAs are more complicated: `a|b|ab` is
+not the same as `ab|a|b`.  When repeatedly matched against "ab" the
+first returns "a","b" and the second "ab".
 
 # The Contenders
 
@@ -22,8 +39,10 @@ Except for KMY:
 
 - all jars are comparable in size at 100 to 200 kB. 
 
-All do Unicode and passed some sanity checks.  Most have extra features, but these vary quite a bit.   Versions and last release date
-are in the [project file](project.scala)
+All do Unicode and passed some sanity checks and other basic
+functionality tests.  Most have extra features, but these vary quite a
+bit.  Versions and last release date are in the [project
+file](project.scala)
 
 - **JavaUtil** version included in Java.   Backtracking NFA.   The standard.
 
