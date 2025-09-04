@@ -177,7 +177,7 @@ package worldofregex {
             |<meta name="viewport" content="width=device-width, initial-scale=1.0">
             |<meta name="view-transition" content="same-origin"> <!-- Opt-in --> 
             |${prefetches}
-            |<title>Menu</title>
+            |<title>Benchmarks</title>
             | <style>
             |.chart {
 	      |  view-transition-name: chart-div; /* Unique identifier for transition */
@@ -199,6 +199,7 @@ package worldofregex {
             |</style>
             |</head>
             |<body>
+            |<p>See <a href="https://github.com/henryware/jvm-regex-benchmarks">https://github.com/henryware/jvm-regex-benchmarks</a></p>
             |${linksList}
             |</body>
             |</html>

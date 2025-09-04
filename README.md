@@ -78,8 +78,9 @@ file](project.scala)
 Also benchmarked:
 
 - **BricsScreen** a different driver I wrote for Brics to avoid
-  `O(N²)` behavior finding the start of a locate.  This costs `O(N)` at
-  runtime as well as time and memory at compile.
+  `O(N²)` behavior finding the start of a locate.  This costs `O(N)`
+  space and time at runtime as well as time and memory at compile.
+  It's also not compatable with streams.
 
 Not (yet) contenders:
 
@@ -175,4 +176,8 @@ To generate the plots, from the CSV:
 echo "worldofregex.Graph.plot()" | scala repl .
 ```
 
-Plots will be available in plots/index.html
+Plots will be written to the plots directory and linked from plots/index.html
+
+# Results
+
+Plots are published at https://henryware.github.io/jvm-regex-benchmarks
