@@ -72,7 +72,7 @@ package worldofregex {
                     case "Fail_to_Match_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""","higher is better")
                     case "Locate_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ ⟨random ascii printable string⟩⟨phoneNumber⟩""","higher is better")
                     case "Fail_to_Locate_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""","higher is better")
-
+                    case "Compile_Long_Pattern" => formTitle(name, """/word1|word2|word3.../""","higher is better")
                     case "Locate_All_Torture_Test" => formTitle(name, "repeatedly: /a(.*X)?/ vs a+", "higher is better")
                     case "Backtrack_Torture_Test" => formTitle(name, "/(a?)ᴺaᴺ/ vs aᴺ" , "lower is better (DFAs too fast to measure)")
                     case _ => formTitle(name);

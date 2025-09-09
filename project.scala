@@ -72,7 +72,7 @@
 // org.scalatest.tools.Runner
 // org.scalatest.run(new MyTest)
 
-//> using dep org.scalacheck::scalacheck:1.18.1
+//> using dep org.scalacheck::scalacheck:1.19.0
 //> using dep org.scalatest::scalatest:3.2.19
 //> using dep org.scalatestplus::scalacheck-1-18:3.2.19.0
 
