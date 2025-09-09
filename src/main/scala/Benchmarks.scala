@@ -19,7 +19,7 @@ package RBench {
     class ZBig{
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","BricsWalk","JavaUtil", "Re2J", "HarpoDFA", "HarpoInterp"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "HarpoDFA", "HarpoInterp"))
         var factoryName:String = uninitialized
 
         var regexes:List[Regex]= uninitialized
@@ -105,6 +105,15 @@ package RBench {
             }
         }
 
+        @Benchmark
+        def Match_ABC_Number_in_Long_Text()= {
+            if (abcEnd.hasPartialMatch(LONG_TEXT_ABC(index))){
+                1
+            } else {
+                0
+            }
+        }
+
     }
 
     /* ZSmall contains throughput tests vs varying length texts
@@ -120,7 +129,7 @@ package RBench {
     class ZSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics", "BricsWalk", "JavaUtil", "Re2J", "HarpoDFA", "HarpoInterp"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "HarpoDFA", "HarpoInterp"))
         var factoryName:String = uninitialized
 
         // @Param(Array("6","8","10"))
@@ -170,7 +179,7 @@ package RBench {
     class TSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","BricsWalk","JavaUtil", "Re2J"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J"))
         var factoryName:String = uninitialized
 
         //@Param(Array("4","8","12"))

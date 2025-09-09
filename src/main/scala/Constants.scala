@@ -61,7 +61,7 @@ package worldofregex {
             s"""${ALMOST_LONG_TEXT(i)}(650) 253-0001."""
         }
 
-        val ABCpat= """[ -~]*ABCDEFGHIJKLMNZ$""";
+        val ABCpat= """[ -~]*ABCDEFGHIJKLMNZ""";
 
         val LONG_TEXT_ABC= Util.Memoize{ (i:Int) =>
             s"""${ALMOST_LONG_TEXT(i)}ABCDEFGHIJKLMNZ""""

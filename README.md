@@ -19,8 +19,12 @@ compilation is very quick.  They can support a rich set of boundary
 conditions as well as back-references and submatches.  Execution,
 while good in many common cases, is `O(2ᴺ)` in some not very remote
 corner cases.
-
-DFAs, aka grep-style, are the headline implementation in compiler classes.  Execution is always a fast `O(N)`.   However, compilation can be `O(2ᴹ)` in space and time in corner cases.   These do not support submatches, boundary conditions or back-references.  
+ 
+DFAs, aka grep-style, are the headline implementation in compiler classes.
+FullMatch is always a fast `O(N)`, others functions worse case to a 
+respectable `O(N²)`.  However, compilation can be `O(2ᴹ)` in space and 
+time in corner cases.  These do not support submatches, boundary conditions 
+or back-references.
 
 Non-backtracking NFAs, aka Thompson's construction, combine good
 execution time: `O(NM)` with good compilation `O(M)`.  Support for
@@ -39,16 +43,16 @@ Except for KMY:
 
 - all jars are comparable in size at 100 to 200 kB. 
 
-All do Unicode and passed some sanity checks and other basic
-functionality tests.  Most have extra features, but these vary quite a
-bit.  Versions and last release date are in the [project
+All do Unicode and passed some sanity checks and properties tests
+of basic functionality.  Most have extra features, but these
+vary quite a bit.  Versions and last release date are in the [project
 file](project.scala)
 
 - **JavaUtil** version included in Java.   Backtracking NFA.   The standard.
 
 - [**Brics Automaton**](https://www.brics.dk/automaton/) BSD license.
-  DFA.  Called *DkBrics* in the code and graphs.  Superpower: full
-  support for intersection, minus, and other set operations
+  DFA.  Called *DkBrics* in the code and graphs.  Superpower: support
+  for intersection, inversion, enumeration, and other set operations
 
 - [**MonqJFA**](https://codeberg.org/harald/monqjfa) GPL2
   license. DFA.  I couldn't find this from Ivy/Maven but a jar is
@@ -80,7 +84,7 @@ Also benchmarked:
 - **BricsScreen** a different driver I wrote for Brics to avoid
   `O(N²)` behavior finding the start of a locate.  This costs `O(N)`
   space and time at runtime as well as time and memory at compile.
-  It's also not compatable with streams.
+  Also, it is not compatable with streams.
 
 Not (yet) contenders:
 
@@ -96,31 +100,33 @@ After the hierarchy in https://swtch.com/~rsc/regexp/regexp3.html
 
 Does the regular expression match the whole input?
 
-- match anything vs various lengths
+
+- **DotStar vs Long Text**(https://henryware.github.io/jvm-regex-benchmarks/DotStar_vs_Long_Text.html) `/.*/` vs `<random string of ascii printables>`.
 
 ### Partial Match
 
 Does the regular expression match a substring of the input?
 
-- match phone number in text
+- **Match Phone Number in Long Text**(https://henryware.github.io/jvm-regex-benchmarks/Match_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩⟨us style phoneNumber⟩`
 
-- look for and don't find phone number in text
+- **Fail to Match Phone Number in Long Text**(https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Match_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩`
 
 ### Locate First
 
 Does the regular expression match a subset of the string?  What is the location of the first such match? 
 
-- look for and locate phone number in text
+- **Locate Phone Number in Long
+  Text**(https://henryware.github.io/jvm-regex-benchmarks/Locate_Phone_Number_in_Long_Text.html)
+  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs `⟨random
+  ascii printable string⟩⟨phoneNumber⟩`
 
-- look for and don't locate phone number in text
+- **Fail to Locate Phone Number in Long Text**(https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Locate_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩`
 
 ### Locate All
 
 Does the regular expression match a subset of the string?  What are the locations of the such matches? 
 
-- look for and locate phone numbers in text
-
-- look for and don't find phone number in text
+- **Locate All Torture Test**(https://henryware.github.io/jvm-regex-benchmarks/Locate_All_Torture_Test.html)  `/a(.*X)?/g` vs `a+`.  All tested implementations struggled with this pattern (ie `O(N²)`).
 
 ### Locate All with Submatches
 
@@ -128,27 +134,22 @@ Does the regular expression match a subset of the string?  What are the location
 
 This is a common poor-man's-parser use case.
 
-- look for, locate and seperate phone numbers in text
-
-Not currently implemented
+- no benchmark for this, currently. 
 
 ### Backtracking Torture Test
 
-- `/(a?){N}a{N}/` vs `a{N}`
-
-This is exponential for backtracking implementations and trival for non-backtracking implementations
-
-### Find All Torture Test
-
-- find many matches of `/a(.*X)?/` in string of 'a' and 'b'
-
-All tested implementations struggled here, but a caching implementation wouldn't.
+- **Backtrack Torture
+  Test**(https://henryware.github.io/jvm-regex-benchmarks/Backtrack_Torture_Test.html)
+  `/(a?){N}a{N}/` vs `a{N}` This is exponential for backtracking
+  implementations and trival for non-backtracking implementations
 
 ### DFA Torture Test
 
-- `/a(a|b){N}x/` is exponential in space.
+- `/a(a|b){N}x/` is exponential in space.  Not currently tested.
 
-not currently tested.
+### Compilation Times
+
+- **Compile Long Pattern**(https://henryware.github.io/jvm-regex-benchmarks/Compile_Long_Pattern.html)  Compile a pattern of the form 'word|locution|morpheme|..." with (mostly) 9 character long English words.
 
 # Instructions
 
@@ -176,8 +177,11 @@ To generate the plots, from the CSV:
 echo "worldofregex.Graph.plot()" | scala repl .
 ```
 
-Plots will be written to the plots directory and linked from plots/index.html
+Plots will be written to the ./plots directory and linked from ./plots/index.html
 
 # Results
 
-Plots are published at https://henryware.github.io/jvm-regex-benchmarks
+All plots are published at https://henryware.github.io/jvm-regex-benchmarks
+
+Joni is very fast.
+
