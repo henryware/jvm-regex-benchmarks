@@ -101,32 +101,32 @@ After the hierarchy in https://swtch.com/~rsc/regexp/regexp3.html
 Does the regular expression match the whole input?
 
 
-- **DotStar vs Long Text**(https://henryware.github.io/jvm-regex-benchmarks/DotStar_vs_Long_Text.html) `/.*/` vs `<random string of ascii printables>`.
+- [**DotStar vs Long Text**](https://henryware.github.io/jvm-regex-benchmarks/DotStar_vs_Long_Text.html) `/.*/` vs `<random string of ascii printables>`.
 
 ### Partial Match
 
 Does the regular expression match a substring of the input?
 
-- **Match Phone Number in Long Text**(https://henryware.github.io/jvm-regex-benchmarks/Match_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩⟨us style phoneNumber⟩`
+- [**Match Phone Number in Long Text**](https://henryware.github.io/jvm-regex-benchmarks/Match_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩⟨us style phoneNumber⟩`
 
-- **Fail to Match Phone Number in Long Text**(https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Match_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩`
+- [**Fail to Match Phone Number in Long Text**](https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Match_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩`
 
 ### Locate First
 
 Does the regular expression match a subset of the string?  What is the location of the first such match? 
 
-- **Locate Phone Number in Long
-  Text**(https://henryware.github.io/jvm-regex-benchmarks/Locate_Phone_Number_in_Long_Text.html)
+- [**Locate Phone Number in Long
+  Text**](https://henryware.github.io/jvm-regex-benchmarks/Locate_Phone_Number_in_Long_Text.html)
   `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs `⟨random
   ascii printable string⟩⟨phoneNumber⟩`
 
-- **Fail to Locate Phone Number in Long Text**(https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Locate_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩`
+- [**Fail to Locate Phone Number in Long Text**](https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Locate_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩`
 
 ### Locate All
 
 Does the regular expression match a subset of the string?  What are the locations of the such matches? 
 
-- **Locate All Torture Test**(https://henryware.github.io/jvm-regex-benchmarks/Locate_All_Torture_Test.html)  `/a(.*X)?/g` vs `a+`.  All tested implementations struggled with this pattern (ie `O(N²)`).
+- [**Locate All Torture Test**](https://henryware.github.io/jvm-regex-benchmarks/Locate_All_Torture_Test.html)  `/a(.*X)?/g` vs `a+`.  All tested implementations struggled with this pattern (ie `O(N²)`).
 
 ### Locate All with Submatches
 
@@ -138,8 +138,8 @@ This is a common poor-man's-parser use case.
 
 ### Backtracking Torture Test
 
-- **Backtrack Torture
-  Test**(https://henryware.github.io/jvm-regex-benchmarks/Backtrack_Torture_Test.html)
+- [**Backtrack Torture
+  Test**](https://henryware.github.io/jvm-regex-benchmarks/Backtrack_Torture_Test.html)
   `/(a?){N}a{N}/` vs `a{N}` This is exponential for backtracking
   implementations and trival for non-backtracking implementations
 
@@ -149,7 +149,7 @@ This is a common poor-man's-parser use case.
 
 ### Compilation Times
 
-- **Compile Long Pattern**(https://henryware.github.io/jvm-regex-benchmarks/Compile_Long_Pattern.html)  Compile a pattern of the form 'word|locution|morpheme|..." with (mostly) 9 character long English words.
+- [**Compile Long Pattern**](https://henryware.github.io/jvm-regex-benchmarks/Compile_Long_Pattern.html)  Compile a pattern of the form 'word|locution|morpheme|..." with (mostly) 9 character long English words.
 
 # Instructions
 
