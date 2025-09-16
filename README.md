@@ -48,7 +48,8 @@ of basic functionality.  Most have extra features, but these
 vary quite a bit.  Versions and last release date are in the [project
 file](project.scala)
 
-- **JavaUtil** version included in Java.   Backtracking NFA.   The standard.
+- **JavaUtil** version included in Java.  Backtracking NFA.  The
+  standard.  Superpower: it's good to be the standard.
 
 - [**Brics Automaton**](https://www.brics.dk/automaton/) BSD license.
   DFA.  Called *DkBrics* in the code and graphs.  Superpower: support
@@ -111,6 +112,8 @@ Does the regular expression match a substring of the input?
 
 - [**Fail to Match Phone Number in Long Text**](https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Match_Phone_Number_in_Long_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs  `⟨random ascii printable string⟩`
 
+- [**Match ABC in Long Text**](https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Match_Phone_Number_in_Long_Text.html) `/[ -~]*ABCDEFGHIJKLMNZ/` vs `<ascii printable>ABCDEFGHIJKLMNZ`.
+
 ### Locate First
 
 Does the regular expression match a subset of the string?  What is the location of the first such match? 
@@ -165,7 +168,7 @@ If you want to run the sanity tests:
 scala test .
 ``` 
 
-To run the JMH benchmarks, generating the CSV:
+To run the JMH benchmarks, generating the CSV (warning: not fast):
 
 ```
 scala run --power --jmh . -- -rf csv
@@ -183,5 +186,4 @@ Plots will be written to the ./plots directory and linked from ./plots/index.htm
 
 All plots are published at https://henryware.github.io/jvm-regex-benchmarks
 
-Joni is very fast.
 

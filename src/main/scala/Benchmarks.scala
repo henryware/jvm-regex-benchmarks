@@ -106,7 +106,7 @@ package RBench {
         }
 
         @Benchmark
-        def Match_ABC_Number_in_Long_Text()= {
+        def Match_ABC_in_Long_Text()= {
             if (abcEnd.hasPartialMatch(LONG_TEXT_ABC(index))){
                 1
             } else {
