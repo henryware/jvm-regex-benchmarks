@@ -39,6 +39,20 @@
  */
 //> using dep org.jruby.joni:joni:2.2.6
 
+/* JiTrex 0.1.17 release ?
+ * Apache
+ */
+//> using jar lib/jitrex-0.1.17.jar
+
+/* Needle 0.0.1 release May 2024
+ * not working for me.
+
+//> using repository "m2Local"
+//> using dep com.justinblank:needle-compiler:0.0.2-SNAPSHOT
+//> using dep com.justinblank:needle-types:0.0.2-SNAPSHOT
+
+ */
+
 /* Lucerne 10.1.0 release Dec 2024
  * Apache
  * Seems to based on Brics with less support tooling
@@ -76,7 +90,7 @@
 //> using dep org.scalatest::scalatest:3.2.19
 //> using dep org.scalatestplus::scalacheck-1-18:3.2.19.0
 
-//> using test.dep org.scalameta::munit::1.1.1
-//> using test.dep org.scalameta::munit-scalacheck::1.1.0
+//> using test.dep org.scalameta::munit::1.2.0
+//> using test.dep org.scalameta::munit-scalacheck::1.2.0
 
 //> using dep io.github.martinhh::scalacheck-derived:0.10.0

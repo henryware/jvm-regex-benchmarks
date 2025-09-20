@@ -1,6 +1,6 @@
 
 package worldofregex {
-    var ENGINES:List[RegexEngine]= List(BricsScreen, DkBrics, MonqJFA, JavaUtil, Re2J, Florian, Joni, KMY, BricsWalk)  
+    var ENGINES:List[RegexEngine]= List(BricsScreen, DkBrics, MonqJFA, JavaUtil, Re2J, Florian, Joni, KMY, BricsWalk, JiTrex)  
 
 
     // stateless interface

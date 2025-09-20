@@ -68,4 +68,4 @@ jmh-result.csv
 README.html
 .env
 plots/
-
+Makefile

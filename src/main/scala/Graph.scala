@@ -75,7 +75,7 @@ package worldofregex {
                     case "Compile_Long_Pattern" => formTitle(name, """/word1|word2|word3.../""","higher is better")
                     case "Locate_All_Torture_Test" => formTitle(name, "repeatedly: /a(.*X)?/ vs a+", "higher is better")
                     case "Match_ABC_in_Long_Text" => formTitle(name, "/[ -~]*ABCDEFGHIJKLMNZ/ vs <ascii printable> \"ABCDEFGHIJKLMNZ\"", "higher is better")
-                    case "Backtrack_Torture_Test" => formTitle(name, "/(a?)ᴺaᴺ/ vs aᴺ" , "lower is better (DFAs too fast to measure)")
+                    case "Backtrack_Torture_Test" => formTitle(name, "/(a?)ᴺaᴺ/ vs aᴺ" , "lower is better (DFAs and JITrex are too fast to measure)")
                     case _ => formTitle(name);
                 }
             }

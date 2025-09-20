@@ -27,8 +27,9 @@ time in corner cases.  These do not support submatches, boundary conditions
 or back-references.
 
 Non-backtracking NFAs, aka Thompson's construction, combine good
-execution time: `O(NM)` with good compilation `O(M)`.  Support for
-submatches and simple boundary conditions is included.
+`O(NM)` execution with good `O(M)` compilation at the expense of a
+higher constant.  Support for submatches and simple boundary
+conditions is included.
 
 The DFAs use POSIX style ambiguity resolution: they return the
 leftmost/longest match.  The NFAs are more complicated: `a|b|ab` is
@@ -43,17 +44,20 @@ Except for KMY:
 
 - all jars are comparable in size at 100 to 200 kB. 
 
-All do Unicode and passed some sanity checks and properties tests
-of basic functionality.  Most have extra features, but these
-vary quite a bit.  Versions and last release date are in the [project
+All do Unicode and passed some sanity checks and properties tests of
+basic functionality.  Most have extra features, but these vary quite a
+bit.
+
+Versions and latest release date are in the [project
 file](project.scala)
 
 - **JavaUtil** version included in Java.  Backtracking NFA.  The
-  standard.  Superpower: it's good to be the standard.
+  standard.  Superpower: it's the standard.
 
 - [**Brics Automaton**](https://www.brics.dk/automaton/) BSD license.
   DFA.  Called *DkBrics* in the code and graphs.  Superpower: support
-  for intersection, inversion, enumeration, and other set operations
+  for intersection, inversion, reversal, enumeration, and other set
+  operations
 
 - [**MonqJFA**](https://codeberg.org/harald/monqjfa) GPL2
   license. DFA.  I couldn't find this from Ivy/Maven but a jar is
@@ -78,20 +82,27 @@ file](project.scala)
   Artistic license.  Very abandoned, but was the most performant
   backtracking implementation in 2015 at
   [regex-libraries-benchmark](https://github.com/gpanther/regex-libraries-benchmarks)
-  Compiles the regex to bytecode.
+  Compiles the regex to bytecode.  Not recommended: code is old and
+  creaky and maybe was never exactly finished.   JITrex has the same
+  approach and doesn't have these problems.
+
+- [**Humio JITrex**](https://github.com/humio/jitrex) Apache license.
+  Update of the KMY code.  Backtracking NFA.  Superpower: compiles the
+  regex to bytecode.  Recently updated but possibly now unmaintained;
+  running version 0.1.17 from a jar.
 
 Also benchmarked:
 
 - **BricsScreen** a different driver I wrote for Brics to avoid
-  `O(N²)` behavior finding the start of a locate.  This costs `O(N)`
-  space and time at runtime as well as time and memory at compile.
-  Also, it is not compatable with streams.
+  `O(N²)` behavior by screening the possible start locations.  This
+  costs `O(N)` space and time at runtime as well as time and memory at
+  compile.  Also, it is not compatable with streams.
 
 Not (yet) contenders:
 
 - **Lucerne** seems to use Brics with less tooling, so I didn't test it
 
-- hyperscan? harpocrates?
+- hyperscan? harpocrates? [needle](https://github.com/hyperpape/needle)? 
 
 # Benchmarks
 
@@ -100,7 +111,6 @@ After the hierarchy in https://swtch.com/~rsc/regexp/regexp3.html
 ### Whole Match
 
 Does the regular expression match the whole input?
-
 
 - [**DotStar vs Long Text**](https://henryware.github.io/jvm-regex-benchmarks/DotStar_vs_Long_Text.html) `/.*/` vs `<random string of ascii printables>`.
 
@@ -131,14 +141,6 @@ Does the regular expression match a subset of the string?  What are the location
 
 - [**Locate All Torture Test**](https://henryware.github.io/jvm-regex-benchmarks/Locate_All_Torture_Test.html)  `/a(.*X)?/g` vs `a+`.  All tested implementations struggled with this pattern (ie `O(N²)`).
 
-### Locate All with Submatches
-
-Does the regular expression match a subset of the string?  What are the locations and submatches of the such matches?
-
-This is a common poor-man's-parser use case.
-
-- no benchmark for this, currently. 
-
 ### Backtracking Torture Test
 
 - [**Backtrack Torture
@@ -146,13 +148,24 @@ This is a common poor-man's-parser use case.
   `/(a?){N}a{N}/` vs `a{N}` This is exponential for backtracking
   implementations and trival for non-backtracking implementations
 
-### DFA Torture Test
-
-- `/a(a|b){N}x/` is exponential in space.  Not currently tested.
-
 ### Compilation Times
 
 - [**Compile Long Pattern**](https://henryware.github.io/jvm-regex-benchmarks/Compile_Long_Pattern.html)  Compile a pattern of the form 'word|locution|morpheme|..." with (mostly) 9 character long English words.
+
+### Lacuna
+
+#### Line test
+
+Alot of regexes work on lines of text of, say, 120 characters.   None of these benchmarks are like that.
+
+#### DFA Torture test
+For DFAs, compiling `/a(a|b){N}x/` is exponential in space.  Not currently tested.
+
+#### Locate All with Submatches
+
+Does the regular expression match a subset of the string?  What are the locations and submatches of the such matches?
+
+This is a common poor-man's-parser use case.  Not currently tested
 
 # Instructions
 
@@ -168,7 +181,7 @@ If you want to run the sanity tests:
 scala test .
 ``` 
 
-To run the JMH benchmarks, generating the CSV (warning: not fast):
+To run the JMH benchmarks and generate the CSV (warning: not fast):
 
 ```
 scala run --power --jmh . -- -rf csv
@@ -185,5 +198,4 @@ Plots will be written to the ./plots directory and linked from ./plots/index.htm
 # Results
 
 All plots are published at https://henryware.github.io/jvm-regex-benchmarks
-
 
