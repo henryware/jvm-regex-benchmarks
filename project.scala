@@ -19,12 +19,12 @@
 //> using dep dk.brics:automaton:1.12-4
 
 // ====
-// MonqJFA from Feb 2025
+// MonqJFA from Aug 2025
 // https://codeberg.org/harald/monqjfa
-// curl -OJ https://codeberg.org/api/packages/harald/generic/monqjfa/4.2.0/monq-4.2.0.jar
+// curl -OJ https://codeberg.org/api/packages/harald/generic/monqjfa/4.3.0/monq-4.3.0.jar
 // GPL2
 
-//> using jar lib/monq-4.2.0.jar
+//> using jar lib/monq-4.3.0.jar
 
 // ====
 // Jint KMY from 2002(!)
