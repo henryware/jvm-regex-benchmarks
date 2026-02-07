@@ -5,6 +5,9 @@
 // turn off scary warnings reguarding lazy vals
 //>using javaOpt --sun-misc-unsafe-memory-access=allow
 
+// Panama FFI for native regex engines (PCRE2, Hyperscan)
+//>using javaOpt --enable-native-access=ALL-UNNAMED
+
 // this is literally a dictionary.
 //>using jar lib/dictionary.jar
 

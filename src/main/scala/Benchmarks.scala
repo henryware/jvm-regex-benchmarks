@@ -19,7 +19,7 @@ package RBench {
     class ZBig{
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2", "Hyperscan", "Re2FFI"))
         var factoryName:String = uninitialized
 
         var regexes:List[Regex]= uninitialized
@@ -129,7 +129,7 @@ package RBench {
     class ZSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2", "Hyperscan", "Re2FFI"))
         var factoryName:String = uninitialized
 
         // @Param(Array("6","8","10"))
@@ -179,7 +179,7 @@ package RBench {
     class TSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Pcre2", "Hyperscan", "Re2FFI"))
         var factoryName:String = uninitialized
 
         //@Param(Array("4","8","12"))

@@ -78,12 +78,33 @@ class Sanity extends ScalaCheckSuite {
         }
     }
 
+    def checkWholeAndPartialOnly(
+        baseName: String,
+        rx: Regex,
+        tc: TestCase
+    )(implicit loc: munit.Location): Unit = {
+        test(baseName + "wholeMatch") {
+            val obtained = rx.hasWholeMatch(tc.text).toString
+            assertEquals(
+                obtained, tc.whole,
+                s"Whole match failed for pattern '${rx}' on text '${tc.text}'"
+            )
+        }
+        test(baseName + "partialMatch") {
+            val obtained = rx.hasPartialMatch(tc.text).toString
+            assertEquals(
+                obtained, tc.partial,
+                s"Partial match failed for pattern '${rx}' on text '${tc.text}'"
+            )
+        }
+    }
+
     def checkWhole[T](
         name: String,
         pat:String,
         rx:Regex)={
         property(name+"CheckWhole") {
-            forAll(RegexpGen.from(pat)){txt => 
+            forAll(RegexpGen.from(pat)){txt =>
                 val obtained = rx.hasWholeMatch(txt);
                 assertEquals(obtained,true)
             }
@@ -178,10 +199,15 @@ class Sanity extends ScalaCheckSuite {
     )
 
     val posixEngines = Set("MonqJFA", "BricsScreen", "DkBrics", "BricsWalk")
-    val anchoredEngines= Set("Joni", "JavaUtil", "Re2J", "Florian")
-    val submatchEngines = Set("Joni", "JavaUtil", "Re2J", "Florian", "HarpoNFA", "HarpoInterp")
+    val anchoredEngines= Set("Joni", "JavaUtil", "Re2J", "Florian", "Pcre2", "Re2FFI")
+    val submatchEngines = Set("Joni", "JavaUtil", "Re2J", "Florian", "HarpoNFA", "HarpoInterp", "Pcre2", "Re2FFI")
     val noSurrogatePairEngines = Set("KMY")
-    val dotMatchesNewlineEngines = posixEngines
+    val dotMatchesNewlineEngines = posixEngines ++ Set("Hyperscan")
+
+    // Hyperscan reports all match endpoints (streaming DFA) — its locate
+    // semantics differ from both greedy DFAs and Perl engines, so only
+    // wholeMatch and hasPartialMatch are validated against the consensus.
+    val limitedTestEngines = Set("Hyperscan")
 
     // Generate tests for each engine and test case
     for (engine <- ENGINES) {
@@ -200,13 +226,19 @@ class Sanity extends ScalaCheckSuite {
 
 
         // Run specific functionality tests
-        for (tc <- activeTestCases) {
-            checkRegexBehavior(s"$engineName-${tc.pattern}-", engine.compile(tc.pattern), tc)
-        }
+        if (limitedTestEngines.contains(engineName)) {
+            for (tc <- activeTestCases) {
+                checkWholeAndPartialOnly(s"$engineName-${tc.pattern}-", engine.compile(tc.pattern), tc)
+            }
+        } else {
+            for (tc <- activeTestCases) {
+                checkRegexBehavior(s"$engineName-${tc.pattern}-", engine.compile(tc.pattern), tc)
+            }
 
-        // Run submatch tests for supported engines
-        for (sc <- activeSubmatchCases) {
-            submatchTest(s"$engineName-${sc.pattern}-", engine.compile(sc.pattern), sc)
+            // Run submatch tests for supported engines
+            for (sc <- activeSubmatchCases) {
+                submatchTest(s"$engineName-${sc.pattern}-", engine.compile(sc.pattern), sc)
+            }
         }
 
         // Run property-based tests for whole matches

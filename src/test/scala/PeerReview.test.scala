@@ -44,8 +44,8 @@ class PeerReview extends ScalaCheckSuite {
                                      BricsScreen,
                                      MonqJFA
                        ))
-    val perl=new Engines("perl",List(JavaUtil,Joni,Florian,Re2J))
-    val greedyAndPerlAndOther=new Engines("all",List(JavaUtil,Joni,Florian,Re2J,DkBrics,BricsWalk,BricsScreen,MonqJFA))
+    val perl=new Engines("perl",List(JavaUtil,Joni,Florian,Re2J,Pcre2,Re2FFI))
+    val greedyAndPerlAndOther=new Engines("all",List(JavaUtil,Joni,Florian,Re2J,Pcre2,Re2FFI,DkBrics,BricsWalk,BricsScreen,MonqJFA))
 
     val variousEngines=List(greedy,perl,greedyAndPerlAndOther);
 

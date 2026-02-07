@@ -43,4 +43,63 @@ object Util{
     def anchorPattern(pat:String)={
         s"""^(?:${pat})$$"""
     }
+
+    /* Create a mapping from byte positions in UTF-8 to character positions in UTF-16.
+     *
+     * Complicated because UTF-8 is variable length and as a bonus, so
+     * is UTF-16.  When a UTF-8 character is 4 bytes, the corresponding
+     * UTF-16 'code-point' is 2 Java chars.
+     */
+    def createByteToCharacterMapping(bytes: Array[Byte]): IArray[Int] = {
+        val byteToCharacter = new Array[Int](bytes.length + 1)
+        var charIndex = 0
+
+        var i = 0
+        while (i < bytes.length) {
+            val byteValue = bytes(i)
+
+            if ((byteValue & 0x80) == 0) {
+                byteToCharacter(i) = charIndex
+                charIndex += 1
+                i += 1
+            } else if ((byteValue & 0xE0) == 0xC0) {
+                if (i + 1 < bytes.length && (bytes(i + 1) & 0xC0) == 0x80) {
+                    byteToCharacter(i) = charIndex
+                    byteToCharacter(i + 1) = -1
+                    charIndex += 1
+                    i += 2
+                } else {
+                    throw new IllegalArgumentException("Invalid UTF-8 encoding at byte index " + i)
+                }
+            } else if ((byteValue & 0xF0) == 0xE0) {
+                if (i + 2 < bytes.length && (bytes(i + 1) & 0xC0) == 0x80 && (bytes(i + 2) & 0xC0) == 0x80) {
+                    byteToCharacter(i) = charIndex
+                    byteToCharacter(i + 1) = -1
+                    byteToCharacter(i + 2) = -1
+                    charIndex += 1
+                    i += 3
+                } else {
+                    throw new IllegalArgumentException("Invalid UTF-8 encoding at byte index " + i)
+                }
+            } else if ((byteValue & 0xF8) == 0xF0) {
+                if (i + 3 < bytes.length && (bytes(i + 1) & 0xC0) == 0x80 && (bytes(i + 2) & 0xC0) == 0x80 && (bytes(i + 3) & 0xC0) == 0x80) {
+                    byteToCharacter(i) = charIndex
+                    byteToCharacter(i + 1) = -1
+                    byteToCharacter(i + 2) = charIndex + 1
+                    byteToCharacter(i + 3) = -1
+                    charIndex += 2
+                    i += 4
+                } else {
+                    throw new IllegalArgumentException("Invalid UTF-8 encoding at byte index " + i)
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid UTF-8 encoding at byte index " + i)
+            }
+        }
+        if (bytes.length >= 0 && byteToCharacter.length > bytes.length) {
+            byteToCharacter(bytes.length) = charIndex
+        }
+
+        IArray.unsafeFromArray(byteToCharacter)
+    }
 }
