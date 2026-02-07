@@ -14,9 +14,10 @@ import wolfendale.scalacheck.regexp.RegexpGen
 
 object RegexGen {
     // these give various implementations parsing trouble.
-    // if we ever want to test parsers, this will need to be revisited.
+    // if we ever want to test parsers, this will need to be revisited;
+    // but for the meantime, just don't generate them
     val metacharacters=Set('&','\u0000','-', '"', '^', '~', '!', "|",
-                           '\\', '\f', '\r', '\b', '#',
+                           '\\', '\f', '\r', '\b', '#','\t','\n',
                            '$','@', '<', '>', '[', ']' ,'{', '}')
 
     def isAllowed(c:Char)= !metacharacters.contains(c)
