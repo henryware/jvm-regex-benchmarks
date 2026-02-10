@@ -16,6 +16,15 @@ import worldofregex.*
 
 class Sanity extends ScalaCheckSuite {
 
+    private def tryEngine(engine: => RegexEngine): Option[RegexEngine] =
+        try Some(engine) catch { case e: Throwable =>
+            System.err.println(s"[worldofregex] engine not available: ${e.getMessage}")
+            None
+        }
+
+    val ENGINES: List[RegexEngine] = List(BricsScreen, DkBrics, MonqJFA, JavaUtil, Re2J, Florian, Joni, KMY, BricsWalk, JiTrex) ++
+        List(tryEngine(Pcre2FFI), tryEngine(HyperscanFFI), tryEngine(Re2FFI)).flatten
+
     case class TestCase(pattern: String, text: String, whole: String, partial: String, first: String, all: String)
     case class SubmatchCase(pattern:String, text:String, expected:List[String]);
 
@@ -199,15 +208,15 @@ class Sanity extends ScalaCheckSuite {
     )
 
     val posixEngines = Set("MonqJFA", "BricsScreen", "DkBrics", "BricsWalk")
-    val anchoredEngines= Set("Joni", "JavaUtil", "Re2J", "Florian", "Pcre2", "Re2FFI")
-    val submatchEngines = Set("Joni", "JavaUtil", "Re2J", "Florian", "HarpoNFA", "HarpoInterp", "Pcre2", "Re2FFI")
+    val anchoredEngines= Set("Joni", "JavaUtil", "Re2J", "Florian", "Pcre2FFI", "Re2FFI")
+    val submatchEngines = Set("Joni", "JavaUtil", "Re2J", "Florian", "HarpoNFA", "HarpoInterp", "Pcre2FFI", "Re2FFI")
     val noSurrogatePairEngines = Set("KMY")
-    val dotMatchesNewlineEngines = posixEngines ++ Set("Hyperscan")
+    val dotMatchesNewlineEngines = posixEngines ++ Set("HyperscanFFI")
 
     // Hyperscan reports all match endpoints (streaming DFA) — its locate
     // semantics differ from both greedy DFAs and Perl engines, so only
     // wholeMatch and hasPartialMatch are validated against the consensus.
-    val limitedTestEngines = Set("Hyperscan")
+    val limitedTestEngines = Set("HyperscanFFI")
 
     // Generate tests for each engine and test case
     for (engine <- ENGINES) {

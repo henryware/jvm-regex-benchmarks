@@ -44,8 +44,12 @@ class PeerReview extends ScalaCheckSuite {
                                      BricsScreen,
                                      MonqJFA
                        ))
-    val perl=new Engines("perl",List(JavaUtil,Joni,Florian,Re2J,Pcre2,Re2FFI))
-    val greedyAndPerlAndOther=new Engines("all",List(JavaUtil,Joni,Florian,Re2J,Pcre2,Re2FFI,DkBrics,BricsWalk,BricsScreen,MonqJFA))
+    private def tryEngine(engine: => RegexEngine): Option[RegexEngine] =
+        try Some(engine) catch { case _: Throwable => None }
+
+    val ffiEngines: List[RegexEngine] = List(tryEngine(Pcre2FFI), tryEngine(Re2FFI)).flatten
+    val perl=new Engines("perl",List(JavaUtil,Joni,Florian,Re2J) ++ ffiEngines)
+    val greedyAndPerlAndOther=new Engines("all",List(JavaUtil,Joni,Florian,Re2J) ++ ffiEngines ++ List(DkBrics,BricsWalk,BricsScreen,MonqJFA))
 
     val variousEngines=List(greedy,perl,greedyAndPerlAndOther);
 

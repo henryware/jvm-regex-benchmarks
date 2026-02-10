@@ -20,8 +20,8 @@ import java.lang.foreign.ValueLayout._
 import java.lang.invoke.{MethodHandle, MethodHandles, MethodType}
 import worldofregex.Util.manglePattern
 
-object Hyperscan extends RegexEngine {
-    val name = "Hyperscan"
+object HyperscanFFI extends RegexEngine {
+    val name = "HyperscanFFI"
 
     private val linker = Linker.nativeLinker()
     private val lib = SymbolLookup.libraryLookup("libhs.so", Arena.global())
@@ -133,8 +133,8 @@ object Hyperscan extends RegexEngine {
         }
 
         new Regex {
-            override def toString = s"Hyperscan($pattern)"
-            def engineName = "Hyperscan"
+            override def toString = s"HyperscanFFI($pattern)"
+            def engineName = "HyperscanFFI"
 
             private def doScan(localScratch: MemorySegment, targetDb: MemorySegment,
                                dataSeg: MemorySegment, dataLen: Int, stub: MemorySegment): Unit = {

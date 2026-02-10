@@ -11,8 +11,8 @@ import java.lang.foreign._
 import java.lang.foreign.ValueLayout._
 import java.lang.invoke.MethodHandle
 
-object Pcre2 extends RegexEngine {
-    val name = "Pcre2"
+object Pcre2FFI extends RegexEngine {
+    val name = "Pcre2FFI"
 
     private val linker = Linker.nativeLinker()
     private val lib = SymbolLookup.libraryLookup("libpcre2-8.so", Arena.global())
@@ -107,8 +107,8 @@ object Pcre2 extends RegexEngine {
         pcre2_jit_compile.invoke(code, PCRE2_JIT_COMPLETE)
 
         new Regex {
-            override def toString = s"Pcre2($pattern)"
-            def engineName = "Pcre2"
+            override def toString = s"Pcre2FFI($pattern)"
+            def engineName = "Pcre2FFI"
 
             def hasWholeMatch(txt: String): Boolean = {
                 val bytes = txt.getBytes("UTF-8")

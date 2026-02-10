@@ -1,8 +1,5 @@
 
 package worldofregex {
-    var ENGINES:List[RegexEngine]= List(BricsScreen, DkBrics, MonqJFA, JavaUtil, Re2J, Florian, Joni, KMY, BricsWalk, JiTrex, Pcre2, Hyperscan, Re2FFI)
-
-
     // stateless interface
     trait RegexEngine{
         def name:String;

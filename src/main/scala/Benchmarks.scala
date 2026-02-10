@@ -19,7 +19,7 @@ package RBench {
     class ZBig{
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2", "Hyperscan", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         var regexes:List[Regex]= uninitialized
@@ -38,14 +38,23 @@ package RBench {
 
         var ax:Regex = uninitialized
 
+        var unavailable:Boolean = false
+
         @Setup
         def prepare():Unit={
-            val engineClass=Class.forName("worldofregex."+factoryName+"$");
-            engine=engineClass.getField("MODULE$").get(null).asInstanceOf[RegexEngine]
+            try {
+                val engineClass=Class.forName("worldofregex."+factoryName+"$");
+                engine=engineClass.getField("MODULE$").get(null).asInstanceOf[RegexEngine]
+            } catch {
+                case _: Throwable =>
+                    System.err.println(s"[benchmark] $factoryName not available, skipping")
+                    unavailable=true
+                    return
+            }
 
             phoneNumber=engine.compile(PHONE_NUM)
             star=engine.compile(".*")
-            
+
             aaa=engine.compile(AAApat(index))
             ax=engine.compile(AXpat)
             abcEnd=engine.compile(ABCpat)
@@ -55,13 +64,14 @@ package RBench {
 
         @Benchmark
         def Compile_Long_Pattern()= {
-            engine.compile(JUMBOpattern(index))
+            if (unavailable) -1 else engine.compile(JUMBOpattern(index))
         }
 
 
         @Benchmark
         def DotStar_vs_Long_Text()= {
-            if (star.hasWholeMatch(LONG_TEXT_PN(index))){
+            if (unavailable) -1
+            else if (star.hasWholeMatch(LONG_TEXT_PN(index))){
                     1
             } else {
                 0
@@ -71,7 +81,8 @@ package RBench {
 
         @Benchmark
         def Match_Phone_Number_in_Long_Text()= {
-            if (phoneNumber.hasPartialMatch(LONG_TEXT_PN(index))){
+            if (unavailable) -1
+            else if (phoneNumber.hasPartialMatch(LONG_TEXT_PN(index))){
                     1
             } else {
                 0
@@ -80,7 +91,8 @@ package RBench {
 
         @Benchmark
         def Fail_to_Match_Phone_Number_in_Long_Text()= {
-            if (phoneNumber.hasPartialMatch(LONG_TEXT(index))){
+            if (unavailable) -1
+            else if (phoneNumber.hasPartialMatch(LONG_TEXT(index))){
                     1
             } else {
                 0
@@ -89,7 +101,8 @@ package RBench {
 
         @Benchmark
         def Locate_Phone_Number_in_Long_Text()= {
-            if (phoneNumber.locateFirstMatchIn(LONG_TEXT_PN(index)) == None){
+            if (unavailable) -1
+            else if (phoneNumber.locateFirstMatchIn(LONG_TEXT_PN(index)) == None){
                     1
             } else {
                 0
@@ -98,7 +111,8 @@ package RBench {
 
         @Benchmark
         def Fail_to_Locate_Phone_Number_in_Long_Text()= {
-            if (phoneNumber.locateFirstMatchIn(LONG_TEXT(index)) == None){
+            if (unavailable) -1
+            else if (phoneNumber.locateFirstMatchIn(LONG_TEXT(index)) == None){
                     1
             } else {
                 0
@@ -107,7 +121,8 @@ package RBench {
 
         @Benchmark
         def Match_ABC_in_Long_Text()= {
-            if (abcEnd.hasPartialMatch(LONG_TEXT_ABC(index))){
+            if (unavailable) -1
+            else if (abcEnd.hasPartialMatch(LONG_TEXT_ABC(index))){
                 1
             } else {
                 0
@@ -129,7 +144,7 @@ package RBench {
     class ZSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2", "Hyperscan", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         // @Param(Array("6","8","10"))
@@ -142,11 +157,19 @@ package RBench {
 
         var ax:Regex = uninitialized
 
+        var unavailable:Boolean = false
 
         @Setup
         def prepare():Unit={
-            val engineClass=Class.forName("worldofregex."+factoryName+"$");
-            engine=engineClass.getField("MODULE$").get(null).asInstanceOf[RegexEngine]
+            try {
+                val engineClass=Class.forName("worldofregex."+factoryName+"$");
+                engine=engineClass.getField("MODULE$").get(null).asInstanceOf[RegexEngine]
+            } catch {
+                case _: Throwable =>
+                    System.err.println(s"[benchmark] $factoryName not available, skipping")
+                    unavailable=true
+                    return
+            }
 
             aaa=engine.compile(AAApat(index))
             ax=engine.compile(AXpat)
@@ -154,7 +177,8 @@ package RBench {
 
         @Benchmark
         def Locate_All_Torture_Test()= {
-            if (index>17) {
+            if (unavailable) -1
+            else if (index>17) {
                 -1  // too slow to run
             } else {
                 var sum=0;
@@ -179,7 +203,7 @@ package RBench {
     class TSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Pcre2", "Hyperscan", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         //@Param(Array("4","8","12"))
@@ -190,17 +214,27 @@ package RBench {
 
         var aaa:Regex = uninitialized
 
+        var unavailable:Boolean = false
+
         @Setup
         def prepare():Unit={
-            val engineClass=Class.forName("worldofregex."+factoryName+"$");
-            engine=engineClass.getField("MODULE$").get(null).asInstanceOf[RegexEngine]
+            try {
+                val engineClass=Class.forName("worldofregex."+factoryName+"$");
+                engine=engineClass.getField("MODULE$").get(null).asInstanceOf[RegexEngine]
+            } catch {
+                case _: Throwable =>
+                    System.err.println(s"[benchmark] $factoryName not available, skipping")
+                    unavailable=true
+                    return
+            }
 
             aaa=engine.compile(AAApat(index))
         }
 
         @Benchmark
         def Backtrack_Torture_Test()= {
-            if (index>=20) {
+            if (unavailable) -1
+            else if (index>=20) {
                 -1  // too slow to run
             } else if (aaa.locateFirstMatchIn(AAA(index)) == None){
                 1
