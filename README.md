@@ -1,7 +1,7 @@
 # Overview
 
-Speed test of various JVM regex libraries.  Following in the tradition
-of
+Speed test of various JVM regex libraries and C libraries callable
+from the JVM.  Following in the tradition of
 [tusker.org](https://web.archive.org/web/20221205160707/https://tusker.org/regex/regex_benchmark.html)
 and the
 [regex-libraries-benchmark](https://github.com/gpanther/regex-libraries-benchmarks),
@@ -40,7 +40,7 @@ first returns "a","b" and the second "ab".
 
 Except for KMY:
 
-- all of these are maintained— most are in active development.
+- all the Java libraries are maintained— most are in active development.
 
 - all jars are comparable in size at 100 to 200 kB. 
 
@@ -50,6 +50,9 @@ bit.
 
 Versions and latest release date are in the [project
 file](project.scala)
+
+The system libraries are widely used libraries called via the JVM's FFI.
+
 
 - **JavaUtil** version included in Java.  Backtracking NFA.  The
   standard.  Superpower: it's the standard.
@@ -82,7 +85,7 @@ file](project.scala)
   Artistic license.  Very abandoned, but was the most performant
   backtracking implementation in 2015 at
   [regex-libraries-benchmark](https://github.com/gpanther/regex-libraries-benchmarks)
-  Compiles the regex to bytecode.  Not recommended: code is old and
+  Compiles the regex to bytecode.  *Not recommended*: code is old and
   creaky and maybe was never exactly finished.   JITrex has the same
   approach and doesn't have these problems.
 
@@ -90,6 +93,19 @@ file](project.scala)
   Update of the KMY code.  Backtracking NFA.  Superpower: compiles the
   regex to bytecode.  Recently updated but possibly now unmaintained;
   running version 0.1.17 from a jar.
+  
+- [**Pcre2FFI**](https://github.com/PCRE2Project/pcre2) BSD-ish license.
+  Perl Compatable RE library.   Backtracking. 
+  
+- [**Re2FFI**](https://github.com/google/re2) BSD-ish license.
+  Nonbacktracking.  Natively C++,  we ship a shim so FFI can call it without addtional libraries.
+
+- [**HyperscanFFI**](https://www.hyperscan.io) BSD license.  Focus on
+  runtime vs compile time and on SIMD optimizations.  Seems especially
+  focused on the common regex use case of scanning log streams.
+  Doesn't exactly pass all the tests--- returns more potential matches
+  and doesn't handle empty matches at all.  So, we only implement
+  hasPartialMatch and hasWholeMatch.
 
 Also benchmarked:
 
@@ -102,7 +118,7 @@ Not (yet) contenders:
 
 - **Lucerne** seems to use Brics with less tooling, so I didn't test it
 
-- hyperscan? harpocrates? [needle](https://github.com/hyperpape/needle)? 
+- harpocrates? [needle](https://github.com/hyperpape/needle)? 
 
 # Benchmarks
 
@@ -168,6 +184,16 @@ Does the regular expression match a subset of the string?  What are the location
 This is a common poor-man's-parser use case.  Not currently tested
 
 # Instructions
+
+To run the FFI engines, you need the libraries.  I installed them with:
+
+```
+apt install libpcre2-dev  libhyperscan-dev libre2-dev
+```
+
+The Re2 engine also needs a shim:  ```make re2```
+
+The pure JVM engines are easier. 
 
 If you want to make a repl:
 

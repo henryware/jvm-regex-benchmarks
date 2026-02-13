@@ -1,7 +1,7 @@
 /**
   *  Adapter for the Joni engine
   *
-  *  This is the most complicated adapter as the Joni engine natively takes UTF-8 rather than UTF-16
+  *  This is complicated as the Joni engine natively takes UTF-8 rather than UTF-16
   */
 
 package worldofregex

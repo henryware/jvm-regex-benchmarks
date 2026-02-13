@@ -16,6 +16,7 @@ import worldofregex.*
 
 class Sanity extends ScalaCheckSuite {
 
+    // FFI engines may or may not be available depending of library availability
     private def tryEngine(engine: => RegexEngine): Option[RegexEngine] =
         try Some(engine) catch { case e: Throwable =>
             System.err.println(s"[worldofregex] engine not available: ${e.getMessage}")

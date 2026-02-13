@@ -1,6 +1,6 @@
 /*
  * Thin C wrapper around Google RE2 (C++ API).
- * Compiled as a shared library and called via Panama FFI from Scala.
+ * Compiled as a shared library and called via Panama FFI from JVM
  *
  * Build:  g++ -shared -fPIC -O2 -o lib/libre2_c.so lib/re2_c.cpp -lre2
  */
