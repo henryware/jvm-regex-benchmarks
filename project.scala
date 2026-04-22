@@ -49,7 +49,7 @@
 // Joni 2.2.5 release March 2025
 // MIT
 
-//> using dep org.jruby.joni:joni:2.2.6
+//> using dep org.jruby.joni:joni:2.2.7
 
 // ====
 // JiTrex 0.1.17 release ?
@@ -101,7 +101,7 @@
 // org.scalatest.run(new MyTest)
 
 //> using dep org.scalacheck::scalacheck:1.19.0
-//> using dep org.scalatest::scalatest:3.2.19
+//> using dep org.scalatest::scalatest:3.2.20
 //> using dep org.scalatestplus::scalacheck-1-18:3.2.19.0
 
 //> using test.dep org.scalameta::munit::1.2.2

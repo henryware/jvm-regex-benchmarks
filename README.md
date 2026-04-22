@@ -157,6 +157,8 @@ Does the regular expression match a subset of the string?  What are the location
 
 - [**Locate All Torture Test**](https://henryware.github.io/jvm-regex-benchmarks/Locate_All_Torture_Test.html)  `/a(.*X)?/g` vs `a+`.  All tested implementations struggled with this pattern (ie `O(N²)`).
 
+It's possible a more cunning driver might be able to avoid this behavior.
+
 ### Backtracking Torture Test
 
 - [**Backtrack Torture
@@ -172,19 +174,21 @@ Does the regular expression match a subset of the string?  What are the location
 
 #### Line test
 
-Alot of regexes work on lines of text of, say, 120 characters.   None of these benchmarks are like that.
+A common regex uses case is work on lines of text of, say, 120 characters.   None of these benchmarks are like that.
 
 #### DFA Torture test
-For DFAs, compiling `/a(a|b){N}x/` is exponential in space.  Not currently tested.
+For DFAs, compiling `/a(a|b){N}x/` is exponential in space.  Not currently tested or benchmarked.
 
 #### Locate All with Submatches
 
 Does the regular expression match a subset of the string?  What are the locations and submatches of the such matches?
 
-This is a common poor-man's-parser use case.  Not currently tested
+This is a common poor-man's-parser use case.  Not currently benchmarked.
 
 # Instructions
 
+
+#### Library Install (Optional)
 To run the FFI engines, you need the libraries.  I installed them with:
 
 ```
@@ -193,7 +197,9 @@ apt install libpcre2-dev  libhyperscan-dev libre2-dev
 
 The Re2 engine also needs a shim:  ```make re2```
 
-The pure JVM engines are easier. 
+If any of the libraries are not installed, everything else should still work.
+
+#### Running
 
 If you want to make a repl:
 
