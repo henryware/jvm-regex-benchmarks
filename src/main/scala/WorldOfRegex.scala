@@ -26,5 +26,5 @@ package worldofregex {
         override def toString()={s"(${start},${end})"}
     };
 
-    class RegexException(msg:String, base:Throwable) extends Exception(msg,base);
+    class RegexException(msg:String, base:Throwable=null) extends Exception(msg,base);
 }

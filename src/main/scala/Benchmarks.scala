@@ -19,7 +19,7 @@ package RBench {
     class ZBig{
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         var regexes:List[Regex]= uninitialized
@@ -62,15 +62,20 @@ package RBench {
 
         }
 
+        // Engines whose Compile_Long_Pattern is especially slow
+        // Amygdalum (minutes to compile), Needle (StackOverflowError at i=16).
+        private val slowLongPatternCompile = Set("Amygdalum")
+
         @Benchmark
         def Compile_Long_Pattern()= {
-            if (unavailable) -1 else engine.compile(JUMBOpattern(index))
+            if (unavailable || (slowLongPatternCompile(factoryName) && index >= 12)) throw new RegexException("engine unavailable");
+            else engine.compile(JUMBOpattern(index))
         }
 
 
         @Benchmark
         def DotStar_vs_Long_Text()= {
-            if (unavailable) -1
+            if (unavailable) throw new RegexException("engine unavailable");
             else if (star.hasWholeMatch(LONG_TEXT_PN(index))){
                     1
             } else {
@@ -81,7 +86,7 @@ package RBench {
 
         @Benchmark
         def Match_Phone_Number_in_Long_Text()= {
-            if (unavailable) -1
+            if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.hasPartialMatch(LONG_TEXT_PN(index))){
                     1
             } else {
@@ -91,7 +96,7 @@ package RBench {
 
         @Benchmark
         def Fail_to_Match_Phone_Number_in_Long_Text()= {
-            if (unavailable) -1
+            if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.hasPartialMatch(LONG_TEXT(index))){
                     1
             } else {
@@ -101,7 +106,7 @@ package RBench {
 
         @Benchmark
         def Locate_Phone_Number_in_Long_Text()= {
-            if (unavailable) -1
+            if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.locateFirstMatchIn(LONG_TEXT_PN(index)) == None){
                     1
             } else {
@@ -111,7 +116,7 @@ package RBench {
 
         @Benchmark
         def Fail_to_Locate_Phone_Number_in_Long_Text()= {
-            if (unavailable) -1
+            if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.locateFirstMatchIn(LONG_TEXT(index)) == None){
                     1
             } else {
@@ -121,7 +126,7 @@ package RBench {
 
         @Benchmark
         def Match_ABC_in_Long_Text()= {
-            if (unavailable) -1
+            if (unavailable) throw new RegexException("engine unavailable");
             else if (abcEnd.hasPartialMatch(LONG_TEXT_ABC(index))){
                 1
             } else {
@@ -144,7 +149,7 @@ package RBench {
     class ZSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2FFI", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "Pcre2FFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         // @Param(Array("6","8","10"))
@@ -203,7 +208,7 @@ package RBench {
     class TSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         //@Param(Array("4","8","12"))

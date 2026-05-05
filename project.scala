@@ -57,14 +57,29 @@
 
 //> using jar lib/jitrex-0.1.17.jar
 
+// ====
+// Pattern Search Algorithms (amygdalum) 0.1.3 released 2024
+// https://patternsearchalgorithms.amygdalum.net/
+// https://github.com/almondtools/patternsearchalgorithms
+// Apache
+
+//> using dep net.amygdalum:patternsearchalgorithms:0.1.3
+
 
 // ====
 // Needle 0.0.1 release May 2024
-// not working for me.
+// https://github.com/hyperpape/needle
+// MIT
+// Parent POM `com.justinblank:needle:0.0.1` was never published to Maven
+// Central, so `//> using dep com.justinblank:needle-compiler:0.0.1` fails to
+// resolve.  Workaround: take the jars directly and pull the transitives by
+// explicit dep.
 
-// //> using repository "m2Local"
-// //> using dep com.justinblank:needle-compiler:0.0.2-SNAPSHOT
-// //> using dep com.justinblank:needle-types:0.0.2-SNAPSHOT
+//> using jar lib/needle-compiler-0.0.1.jar
+//> using jar lib/needle-types-0.0.1.jar
+//> using dep com.justinblank:mako:0.0.4
+//> using dep org.apache.commons:commons-lang3:3.8
+//> using dep net.bytebuddy:byte-buddy:1.10.20
 
 // ====
 // Lucerne 10.1.0 release Dec 2024
@@ -104,7 +119,7 @@
 //> using dep org.scalatest::scalatest:3.2.20
 //> using dep org.scalatestplus::scalacheck-1-18:3.2.19.0
 
-//> using test.dep org.scalameta::munit::1.2.2
-//> using test.dep org.scalameta::munit-scalacheck::1.2.0
+//> using test.dep org.scalameta::munit::1.3.0
+//> using test.dep org.scalameta::munit-scalacheck::1.3.0
 
 //> using dep io.github.martinhh::scalacheck-derived:0.10.0

@@ -40,9 +40,9 @@ first returns "a","b" and the second "ab".
 
 Except for KMY:
 
-- all the Java libraries are maintained— most are in active development.
+- all the jar and libraries are maintained— most are in active development.
 
-- all jars are comparable in size at 100 to 200 kB. 
+- all jars are comparable in size at a modest 100 to 200 kB. 
 
 All do Unicode and passed some sanity checks and properties tests of
 basic functionality.  Most have extra features, but these vary quite a
@@ -94,17 +94,21 @@ The system libraries are widely used libraries called via the JVM's FFI.
   regex to bytecode.  Recently updated but possibly now unmaintained;
   running version 0.1.17 from a jar.
   
-- [**Pcre2FFI**](https://github.com/PCRE2Project/pcre2) BSD-ish license.
+- [**Amygdalum**](https://patternsearchalgorithms.amygdalum.net/)  LGPL.   DFA.   Superpower is streaming / non-string input accepting CharProvider, ByteProvider, byte[], and InputStream-style sources.
+
+- [**Needle**](https://github.com/hyperpape/needle) MIT.   DFA.  Still under construction, but basic functionality implemented and working.  Superpower: compiles the regex to bytecode.
+
+- [**Pcre2FFI**](https://github.com/PCRE2Project/pcre2) BSD-ish license.   Requires library.
   Perl Compatable RE library.   Backtracking. 
   
-- [**Re2FFI**](https://github.com/google/re2) BSD-ish license.
+- [**Re2FFI**](https://github.com/google/re2) BSD-ish license.   Requires library.
   Nonbacktracking.  Natively C++,  we ship a shim so FFI can call it without addtional libraries.
 
-- [**HyperscanFFI**](https://www.hyperscan.io) BSD license.  Focus on
+- [**HyperscanFFI**](https://www.hyperscan.io) BSD license.  Requires library.  Focus on
   runtime vs compile time and on SIMD optimizations.  Seems especially
   focused on the common regex use case of scanning log streams.
   Doesn't exactly pass all the tests--- returns more potential matches
-  and doesn't handle empty matches at all.  So, we only implement
+  and doesn't handle zero length matches at all.  So, we only implement
   hasPartialMatch and hasWholeMatch.
 
 Also benchmarked:
@@ -118,7 +122,10 @@ Not (yet) contenders:
 
 - **Lucerne** seems to use Brics with less tooling, so I didn't test it
 
-- harpocrates? [needle](https://github.com/hyperpape/needle)? 
+- [**DFA-Regex**](https://github.com/zhztheplayer/DFA-Regex) Odd match semantics, ASCII only, abandoned since 2016.
+
+- harpocrates? 
+
 
 # Benchmarks
 
@@ -187,6 +194,7 @@ This is a common poor-man's-parser use case.  Not currently benchmarked.
 
 # Instructions
 
+The only prerequisit for the JVM engines is the Scala cli.
 
 #### Library Install (Optional)
 To run the FFI engines, you need the libraries.  I installed them with:
@@ -197,7 +205,7 @@ apt install libpcre2-dev  libhyperscan-dev libre2-dev
 
 The Re2 engine also needs a shim:  ```make re2```
 
-If any of the libraries are not installed, everything else should still work.
+If any or all of the libraries are not installed, the other engines should still work.
 
 #### Running
 
@@ -213,7 +221,7 @@ If you want to run the sanity tests:
 scala test .
 ``` 
 
-To run the JMH benchmarks and generate the CSV (warning: not fast):
+To run the JMH benchmarks and generate the CSV (warning: takes about a day):
 
 ```
 scala run --power --jmh . -- -rf csv
