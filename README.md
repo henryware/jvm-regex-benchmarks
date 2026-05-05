@@ -94,7 +94,7 @@ The system libraries are widely used libraries called via the JVM's FFI.
   regex to bytecode.  Recently updated but possibly now unmaintained;
   running version 0.1.17 from a jar.
   
-- [**Amygdalum**](https://patternsearchalgorithms.amygdalum.net/)  LGPL.   DFA.   Superpower is streaming / non-string input accepting CharProvider, ByteProvider, byte[], and InputStream-style sources.
+- [**Amygdalum**](https://patternsearchalgorithms.amygdalum.net/)  LGPL.   DFA.   Superpower is streaming input.
 
 - [**Needle**](https://github.com/hyperpape/needle) MIT.   DFA.  Still under construction, but basic functionality implemented and working.  Superpower: compiles the regex to bytecode.
 
