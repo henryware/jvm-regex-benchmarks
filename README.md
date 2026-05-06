@@ -104,12 +104,13 @@ The system libraries are widely used libraries called via the JVM's FFI.
 - [**Re2FFI**](https://github.com/google/re2) BSD-ish license.   Requires library.
   Nonbacktracking.  Natively C++,  we ship a shim so FFI can call it without addtional libraries.
 
-- [**HyperscanFFI**](https://www.hyperscan.io) BSD license.  Requires library.  Focus on
-  runtime vs compile time and on SIMD optimizations.  Seems especially
-  focused on the common regex use case of scanning log streams.
-  Doesn't exactly pass all the tests--- returns more potential matches
-  and doesn't handle zero length matches at all.  So, we only implement
-  hasPartialMatch and hasWholeMatch.
+- [**HyperscanFFI**](https://www.hyperscan.io) BSD license.  Requires
+  library.  Focus on runtime vs compile time and on SIMD
+  optimizations.  Seems especially focused on the common regex use
+  case of scanning log streams.  Doesn't exactly pass all the tests---
+  returns more potential matches and doesn't handle zero length
+  matches at all.  Hyperscan's `locate*` methods exist and are
+  benchmarked but maybe shouldn't be, as they are not compatable.
 
 Also benchmarked:
 

@@ -2,8 +2,8 @@ package worldofregex
 
 /*
  * Several regex implementations mimic the java.util.regex class
- * heirarchy for source code compatability.  We need a little more
- * than that here: but without any inheritance
+ * hierarchy giving source code compatability.  This is a base class
+ * for the relevant adapters. 
  */
 
 trait StandardEngine extends RegexEngine {
@@ -15,6 +15,7 @@ trait StandardEngine extends RegexEngine {
     def pmatcher(rx: PatternImpl, txt:String):M
 
     trait M {
+        // these match the Java signatures for `export` friendliness.
         def matches():Boolean
         def find():Boolean
         def groupCount():Int
