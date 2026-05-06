@@ -38,19 +38,21 @@ first returns "a","b" and the second "ab".
 
 # The Contenders
 
-Some are Jars some are libraries.  Except for KMY and JITrex, all are
+Some are Jars, some are libraries.  Except for KMY and JITrex, all are
 maintained.  Most are in active developement.
 
 All the jars are comparable in size at a modest 100 to 200 kB. 
 
-All do Unicode and passed some sanity checks and properties tests of
+All do Unicode.  All passed some sanity checks and properties tests of
 basic functionality.  Most have extra features, but these vary quite a
-bit and are generally not tested.
+bit and are generally not tested here.
 
-Versions and latest release date are in the [project
+Versions and latest release dates are in the [project
 file](project.scala)
 
 The libraries are widely used C/C++ libraries called via the JVM's FFI.
+
+### Current Contenders
 
 - **JavaUtil** version included in Java.  Backtracking NFA.  The
   standard.  Superpower: it's the standard.
@@ -58,7 +60,9 @@ The libraries are widely used C/C++ libraries called via the JVM's FFI.
 - [**Brics Automaton**](https://www.brics.dk/automaton/) BSD license.
   DFA.  Called *DkBrics* in the code and graphs.  Superpower:
   regular-language algebra — intersection, union, complement,
-  difference, reversal, finite-string enumeration.
+  difference, reversal, finite-string enumeration.  Also
+  programatically exposes the automation, which, while not a
+  full Superpower is pretty cool.
 
 - [**MonqJFA**](https://codeberg.org/harald/monqjfa) GPL2
   license. DFA.  I couldn't find this from Ivy/Maven but a jar is
@@ -68,9 +72,9 @@ The libraries are widely used C/C++ libraries called via the JVM's FFI.
   DFA matches
 
 - [**RE2/J**](https://github.com/google/re2j) Go license.
-  Non-backtracking NFA.  Related to
-  the engine in Go and the Re2 C++ libraries.  Superpower: bulletproof
-  due to its solidly linear implementation. ReDOS immune.
+  Non-backtracking NFA.  Related to the engine in Go and the Re2 C++
+  libraries.  Superpower: bulletproof due to its solidly linear
+  implementation. ReDOS immune.
 
 - [**floriangerl**](https://github.com/florianingerl/com.florianingerl.util.regex)
   MIT license.  Backtracking NFA.  Superpower: recursive regular
@@ -97,15 +101,21 @@ The libraries are widely used C/C++ libraries called via the JVM's FFI.
   known activity around the Humio→CrowdStrike acquisition (early
   2021); we run bundled jar 0.1.17.
   
-- [**Amygdalum**](https://patternsearchalgorithms.amygdalum.net/)  LGPL.   DFA.   Superpower is streaming input.
+- [**Amygdalum**](https://patternsearchalgorithms.amygdalum.net/)
+  LGPL.  DFA.  Superpower is streaming input.
 
-- [**Needle**](https://github.com/hyperpape/needle) MIT.   DFA with Perl style ambiguity resolution.  Still under construction, but basic functionality implemented and working.  Superpower: compiles the regex to JVM bytecode at either at run or build time.
+- [**Needle**](https://github.com/hyperpape/needle) MIT.  DFA with
+  Perl style ambiguity resolution.  Still under construction, but
+  basic functionality implemented and working.  Superpower: compiles
+  the regex to JVM bytecode at either run time or build time.
 
-- [**Pcre2FFI**](https://github.com/PCRE2Project/pcre2) BSD-ish license.   Backtracking NFA.   Requires library.
-  Perl Compatable RE library.   Compiles regex to its private bytecode.
+- [**Pcre2FFI**](https://github.com/PCRE2Project/pcre2) BSD-ish
+  license.  Backtracking NFA.  Requires library.  Perl Compatable RE
+  library.  Compiles regex to its private bytecode.
   
-- [**Re2FFI**](https://github.com/google/re2) BSD license.   Backtracking NFA with DFA cache.   Requires library.
-  Nonbacktracking.  Natively C++,  we ship a C shim so FFI can call it.
+- [**Re2FFI**](https://github.com/google/re2) BSD license.
+  Backtracking NFA with DFA cache.  Requires library.
+  Nonbacktracking.  Natively C++, we ship a C shim so FFI can call it.
 
 - [**HyperscanFFI**](https://www.hyperscan.io) BSD license.  Requires
   library.  Focus on runtime vs compile time and on SIMD
@@ -115,7 +125,7 @@ The libraries are widely used C/C++ libraries called via the JVM's FFI.
   matches at all.  Hyperscan's `locate*` methods exist and are
   benchmarked but maybe shouldn't be, as they are not compatable.
 
-Also benchmarked:
+### Also Benchmarked
 
 - **BricsScreen** an alternative driver I wrote for Brics, to avoid
   the `O(N²)` worst case of the stock driver on "almost matches"
@@ -126,7 +136,7 @@ Also benchmarked:
   and memory (two automata) and `O(N)` runtime space.  This trick is
   only possible because Brics exposes its regular-language algebra.
 
-Not (yet) contenders:
+### Not (yet) contenders
 
 - **Lucerne** seems to use Brics with less tooling, so I didn't test it
 
