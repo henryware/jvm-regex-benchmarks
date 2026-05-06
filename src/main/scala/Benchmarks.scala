@@ -19,7 +19,7 @@ package RBench {
     class ZBig{
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "JoniUTF16", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         var regexes:List[Regex]= uninitialized
@@ -134,6 +134,26 @@ package RBench {
             }
         }
 
+        @Benchmark
+        def Match_Phone_Number_in_Long_Unicode_Text()= {
+            if (unavailable) throw new RegexException("engine unavailable");
+            else if (phoneNumber.hasPartialMatch(LONG_UNICODE_TEXT_PN(index))){
+                1
+            } else {
+                0
+            }
+        }
+
+        @Benchmark
+        def Fail_to_Match_Phone_Number_in_Long_Unicode_Text()= {
+            if (unavailable) throw new RegexException("engine unavailable");
+            else if (phoneNumber.hasPartialMatch(LONG_UNICODE_TEXT(index))){
+                1
+            } else {
+                0
+            }
+        }
+
     }
 
     /* ZSmall contains throughput tests vs varying length texts
@@ -149,7 +169,7 @@ package RBench {
     class ZSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "Pcre2FFI", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "JoniUTF16", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "Pcre2FFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         // @Param(Array("6","8","10"))
@@ -208,7 +228,7 @@ package RBench {
     class TSmall {
         import Constants._
 
-        @Param(Array("KMY", "Joni", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
+        @Param(Array("KMY", "Joni", "JoniUTF16", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
         var factoryName:String = uninitialized
 
         //@Param(Array("4","8","12"))

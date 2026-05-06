@@ -64,8 +64,10 @@ The system libraries are widely used libraries called via the JVM's FFI.
 
 - [**MonqJFA**](https://codeberg.org/harald/monqjfa) GPL2
   license. DFA.  I couldn't find this from Ivy/Maven but a jar is
-  available.  This has some support for capturing groups, but I have
-  not yet written an adapter.  Superpower: tooling inside DFA matches
+  available.  MonqJFA has output-action machinery adjacent to
+  capture, but it isn't exposed as standard `(group)` capture and the
+  adapter here doesn't wire any of it up.  Superpower: tooling inside
+  DFA matches
 
 - [**RE2/J**](https://github.com/google/re2j) Go license.  Related to
   the engine in Go and the Re2 C++ libraries.  Non-backtracking NFA.
@@ -76,10 +78,10 @@ The system libraries are widely used libraries called via the JVM's FFI.
   MIT license.  Backtracking NFA.  Superpower: recursive regular
   expressions
 
-- [**Joni**](https://github.com/jruby/joni) MIT license.  Seems to be
-  a backtracking NFA.  Natively uses UTF-8 bytes as input— tested via
-  a java.lang.Character based API.  Superpower: Even faster with UTF-8
-  input
+- [**Joni**](https://github.com/jruby/joni) MIT license.  Backtracking
+  NFA.  Superpowers: capture history as well as configurable input
+  encoding and regex syntax dialect.  The main driver feeds it UTF-8.
+  We also have the **JoniUTF16** driver which is faster on CJK.
 
 - [**kmy.regex.util**](https://jint.sourceforge.net/javadoc/kmy/regex/util/Regex.html)
   Artistic license.  Very abandoned, but was the most performant

@@ -61,6 +61,24 @@ package worldofregex {
             s"""${ALMOST_LONG_TEXT(i)}(650) 253-0001."""
         }
 
+        // Non-ASCII corpus: CJK Unified Ideographs (3 bytes/char in UTF-8,
+        // 2 bytes/char in UTF-16). Lets benchmarks isolate the encoding-buffer-
+        // size effect from the engine's per-char work.
+        val LONG_UNICODE_TEXT= Util.Memoize{ (i:Int) =>
+            val n= 1<<(i)
+            Gen.stringOfN(n, Gen.choose(0x4e00, 0x9fff).map(_.toChar)).sample.get
+        }
+
+        val ALMOST_LONG_UNICODE_TEXT= Util.Memoize{ (i:Int) =>
+            val len=1<<(i)
+            val n=if (len >=15) len-15 else 0
+            Gen.stringOfN(n, Gen.choose(0x4e00, 0x9fff).map(_.toChar)).sample.get
+        }
+
+        val LONG_UNICODE_TEXT_PN= Util.Memoize{ (i:Int) =>
+            s"""${ALMOST_LONG_UNICODE_TEXT(i)}(650) 253-0001."""
+        }
+
         val ABCpat= """[ -~]*ABCDEFGHIJKLMNZ""";
 
         val LONG_TEXT_ABC= Util.Memoize{ (i:Int) =>
