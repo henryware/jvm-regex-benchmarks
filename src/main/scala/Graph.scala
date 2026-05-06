@@ -70,6 +70,8 @@ package worldofregex {
                     case "DotStar_vs_Long_Text" => formTitle(name, "/.*/ vs ⟨random ascii printable string⟩", "higher is better")
                     case "Match_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random ascii printable string⟩⟨phoneNumber⟩""","higher is better")
                     case "Fail_to_Match_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""","higher is better")
+                    case "Match_Phone_Number_in_Long_Unicode_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩⟨phoneNumber⟩""","higher is better")
+                    case "Fail_to_Match_Phone_Number_in_Long_Unicode_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩""","higher is better")
                     case "Locate_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ ⟨random ascii printable string⟩⟨phoneNumber⟩""","higher is better")
                     case "Fail_to_Locate_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""","higher is better")
                     case "Compile_Long_Pattern" => formTitle(name, """/word1|word2|word3.../""","higher is better")

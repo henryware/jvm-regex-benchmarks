@@ -62,8 +62,7 @@ package worldofregex {
         }
 
         // Non-ASCII corpus: CJK Unified Ideographs (3 bytes/char in UTF-8,
-        // 2 bytes/char in UTF-16). Lets benchmarks isolate the encoding-buffer-
-        // size effect from the engine's per-char work.
+        // 2 bytes/char in UTF-16).  Implementations/drivers have tradeoffs, lets see how they played out
         val LONG_UNICODE_TEXT= Util.Memoize{ (i:Int) =>
             val n= 1<<(i)
             Gen.stringOfN(n, Gen.choose(0x4e00, 0x9fff).map(_.toChar)).sample.get

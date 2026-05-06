@@ -61,7 +61,7 @@
 // Pattern Search Algorithms (amygdalum) 0.1.3 released 2024
 // https://patternsearchalgorithms.amygdalum.net/
 // https://github.com/almondtools/patternsearchalgorithms
-// Apache
+// LGPL
 
 //> using dep net.amygdalum:patternsearchalgorithms:0.1.3
 

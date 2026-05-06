@@ -63,7 +63,7 @@ package RBench {
         }
 
         // Engines whose Compile_Long_Pattern is especially slow
-        // Amygdalum (minutes to compile), Needle (StackOverflowError at i=16).
+        // Amygdalum (minutes to compile)  
         private val slowLongPatternCompile = Set("Amygdalum")
 
         @Benchmark

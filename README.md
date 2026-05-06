@@ -38,29 +38,27 @@ first returns "a","b" and the second "ab".
 
 # The Contenders
 
-Except for KMY:
+Some are Jars some are libraries.  Except for KMY and JITrex, all are
+maintained.  Most are in active developement.
 
-- all the jar and libraries are maintained— most are in active development.
-
-- all jars are comparable in size at a modest 100 to 200 kB. 
+All the jars are comparable in size at a modest 100 to 200 kB. 
 
 All do Unicode and passed some sanity checks and properties tests of
 basic functionality.  Most have extra features, but these vary quite a
-bit.
+bit and are generally not tested.
 
 Versions and latest release date are in the [project
 file](project.scala)
 
-The system libraries are widely used libraries called via the JVM's FFI.
-
+The libraries are widely used C/C++ libraries called via the JVM's FFI.
 
 - **JavaUtil** version included in Java.  Backtracking NFA.  The
   standard.  Superpower: it's the standard.
 
 - [**Brics Automaton**](https://www.brics.dk/automaton/) BSD license.
-  DFA.  Called *DkBrics* in the code and graphs.  Superpower: support
-  for intersection, inversion, reversal, enumeration, and other set
-  operations
+  DFA.  Called *DkBrics* in the code and graphs.  Superpower:
+  regular-language algebra — intersection, union, complement,
+  difference, reversal, finite-string enumeration.
 
 - [**MonqJFA**](https://codeberg.org/harald/monqjfa) GPL2
   license. DFA.  I couldn't find this from Ivy/Maven but a jar is
@@ -69,10 +67,10 @@ The system libraries are widely used libraries called via the JVM's FFI.
   adapter here doesn't wire any of it up.  Superpower: tooling inside
   DFA matches
 
-- [**RE2/J**](https://github.com/google/re2j) Go license.  Related to
-  the engine in Go and the Re2 C++ libraries.  Non-backtracking NFA.
-  Re2 includes a DFA, not sure if this does.  Superpower: bulletproof
-  due to it's solidly polynomial implementation
+- [**RE2/J**](https://github.com/google/re2j) Go license.
+  Non-backtracking NFA.  Related to
+  the engine in Go and the Re2 C++ libraries.  Superpower: bulletproof
+  due to its solidly linear implementation. ReDOS immune.
 
 - [**floriangerl**](https://github.com/florianingerl/com.florianingerl.util.regex)
   MIT license.  Backtracking NFA.  Superpower: recursive regular
@@ -92,19 +90,22 @@ The system libraries are widely used libraries called via the JVM's FFI.
   approach and doesn't have these problems.
 
 - [**Humio JITrex**](https://github.com/humio/jitrex) Apache license.
-  Update of the KMY code.  Backtracking NFA.  Superpower: compiles the
-  regex to bytecode.  Recently updated but possibly now unmaintained;
-  running version 0.1.17 from a jar.
+  Backtracking NFA.  Update of the KMY code — the working version of
+  that experiment.  Superpower: compiles the regex to JVM bytecode at
+  pattern-compile time, so matching is direct bytecode execution
+  rather than NFA-state interpretation.  Likely unmaintained — last
+  known activity around the Humio→CrowdStrike acquisition (early
+  2021); we run bundled jar 0.1.17.
   
 - [**Amygdalum**](https://patternsearchalgorithms.amygdalum.net/)  LGPL.   DFA.   Superpower is streaming input.
 
-- [**Needle**](https://github.com/hyperpape/needle) MIT.   DFA.  Still under construction, but basic functionality implemented and working.  Superpower: compiles the regex to bytecode.
+- [**Needle**](https://github.com/hyperpape/needle) MIT.   DFA with Perl style ambiguity resolution.  Still under construction, but basic functionality implemented and working.  Superpower: compiles the regex to JVM bytecode at either at run or build time.
 
-- [**Pcre2FFI**](https://github.com/PCRE2Project/pcre2) BSD-ish license.   Requires library.
-  Perl Compatable RE library.   Backtracking. 
+- [**Pcre2FFI**](https://github.com/PCRE2Project/pcre2) BSD-ish license.   Backtracking NFA.   Requires library.
+  Perl Compatable RE library.   Compiles regex to its private bytecode.
   
-- [**Re2FFI**](https://github.com/google/re2) BSD-ish license.   Requires library.
-  Nonbacktracking.  Natively C++,  we ship a shim so FFI can call it without addtional libraries.
+- [**Re2FFI**](https://github.com/google/re2) BSD license.   Backtracking NFA with DFA cache.   Requires library.
+  Nonbacktracking.  Natively C++,  we ship a C shim so FFI can call it.
 
 - [**HyperscanFFI**](https://www.hyperscan.io) BSD license.  Requires
   library.  Focus on runtime vs compile time and on SIMD
@@ -116,10 +117,14 @@ The system libraries are widely used libraries called via the JVM's FFI.
 
 Also benchmarked:
 
-- **BricsScreen** a different driver I wrote for Brics to avoid
-  `O(N²)` behavior by screening the possible start locations.  This
-  costs `O(N)` space and time at runtime as well as time and memory at
-  compile.  Also, it is not compatable with streams.
+- **BricsScreen** an alternative driver I wrote for Brics, to avoid
+  the `O(N²)` worst case of the stock driver on "almost matches"
+  (e.g. `a(.*X)?` against text with no X).  Builds a reverse automaton
+  from `(re ~ .*).reverse`, screens end-points in `O(N)`, then runs
+  the forward automaton only from those points — turning the bad cases
+  from `O(N²)` to `O(N)`.  Costs vs stock Brics: extra compile time
+  and memory (two automata) and `O(N)` runtime space.  This trick is
+  only possible because Brics exposes its regular-language algebra.
 
 Not (yet) contenders:
 
@@ -150,6 +155,10 @@ Does the regular expression match a substring of the input?
 
 - [**Match ABC in Long Text**](https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Match_Phone_Number_in_Long_Text.html) `/[ -~]*ABCDEFGHIJKLMNZ/` vs `<ascii printable>ABCDEFGHIJKLMNZ`.
 
+- [**Match Phone Number in Long Unicode Text**](https://henryware.github.io/jvm-regex-benchmarks/Match_Phone_Number_in_Long_Unicode_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs `⟨random CJK Unified Ideographs⟩⟨us style phoneNumber⟩`
+
+- [**Fail to Match Phone Number in Long Unicode Text**](https://henryware.github.io/jvm-regex-benchmarks/Fail_to_Match_Phone_Number_in_Long_Unicode_Text.html)  `/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/` vs `⟨random CJK Unified Ideographs⟩`
+
 ### Locate First
 
 Does the regular expression match a subset of the string?  What is the location of the first such match? 
@@ -165,9 +174,7 @@ Does the regular expression match a subset of the string?  What is the location 
 
 Does the regular expression match a subset of the string?  What are the locations of the such matches? 
 
-- [**Locate All Torture Test**](https://henryware.github.io/jvm-regex-benchmarks/Locate_All_Torture_Test.html)  `/a(.*X)?/g` vs `a+`.  All tested implementations struggled with this pattern (ie `O(N²)`).
-
-It's possible a more cunning driver might be able to avoid this behavior.
+- [**Locate All Torture Test**](https://henryware.github.io/jvm-regex-benchmarks/Locate_All_Torture_Test.html)  `/a(.*X)?/g` vs `a+`.  All tested implementations struggled with this usage pattern (ie `O(N²)`).   Proper parsers are not obsolete.
 
 ### Backtracking Torture Test
 
@@ -206,7 +213,7 @@ To run the FFI engines, you need the libraries.  I installed them with:
 apt install libpcre2-dev  libhyperscan-dev libre2-dev
 ```
 
-The Re2 engine also needs a shim:  ```make re2```
+The Re2 engine also needs a shim.  If you have g++:  ```make re2```
 
 If any or all of the libraries are not installed, the other engines should still work.
 
