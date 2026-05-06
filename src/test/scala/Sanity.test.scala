@@ -24,7 +24,7 @@ class Sanity extends ScalaCheckSuite {
         }
 
     val ENGINES: List[RegexEngine] = List(BricsScreen, DkBrics, MonqJFA, JavaUtil, Re2J, Florian, Joni, KMY, BricsWalk, JiTrex, Amygdalum, Needle) ++
-        List(tryEngine(Pcre2FFI), tryEngine(HyperscanFFI), tryEngine(Re2FFI)).flatten
+        List(tryEngine(Pcre2FFI), tryEngine(HyperscanFFI), tryEngine(Re2FFI)).flatten // :+ Bogus
 
     case class TestCase(pattern: String, text: String, whole: String, partial: String, first: String, all: String)
     case class SubmatchCase(pattern:String, text:String, expected:List[String]);
@@ -208,7 +208,7 @@ class Sanity extends ScalaCheckSuite {
         SubmatchCase("(é)", "éa😂a😂a𝄞€4é", List("(0,1)","(12,13)"))
     )
 
-    val posixEngines = Set("MonqJFA", "BricsScreen", "DkBrics", "BricsWalk", "Amygdalum")
+    val posixEngines = Set("MonqJFA", "BricsScreen", "DkBrics", "BricsWalk", "Amygdalum") 
     val anchoredEngines= Set("Joni", "JavaUtil", "Re2J", "Florian", "Pcre2FFI", "Re2FFI")
     val submatchEngines = Set("Joni", "JavaUtil", "Re2J", "Florian", "HarpoNFA", "HarpoInterp", "Pcre2FFI", "Re2FFI")
     val noSurrogatePairEngines = Set("KMY")

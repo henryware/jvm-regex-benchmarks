@@ -15,11 +15,11 @@ trait StandardEngine extends RegexEngine {
     def pmatcher(rx: PatternImpl, txt:String):M
 
     trait M {
-        def matches:Boolean
-        def find:Boolean
-        def groupCount:Int
-        def start:Int
-        def `end`:Int
+        def matches():Boolean
+        def find():Boolean
+        def groupCount():Int
+        def start():Int
+        def `end`():Int
         def start(group:Int):Int
         def `end`(group:Int):Int
     }
@@ -37,21 +37,21 @@ trait StandardEngine extends RegexEngine {
             }
         }
 
-        def hasWholeMatch(txt:String):Boolean=pmatcher(rx,txt).matches
+        def hasWholeMatch(txt:String):Boolean=pmatcher(rx,txt).matches()
 
-        def hasPartialMatch(txt:String):Boolean=pmatcher(rx,txt).find
+        def hasPartialMatch(txt:String):Boolean=pmatcher(rx,txt).find()
 
         inline private def submatches(m:M)={
-            if (m.groupCount==0) {
+            if (m.groupCount()==0) {
                 Nil
             } else {
-                (1 to m.groupCount).map{i => (m.start(i),m.end(i))}
+                (1 to m.groupCount()).map{i => (m.start(i),m.end(i))}
             }
         }
 
         private def findMatch(m:M)={
-            m.find match {
-                case true => Some(Location(m.start,m.end,submatches(m)));
+            m.find() match {
+                case true => Some(Location(m.start(),m.end(),submatches(m)));
                 case false => None
             }
         }
