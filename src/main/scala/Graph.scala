@@ -23,6 +23,16 @@ package worldofregex {
 
             val skipSet=skipThese.toSet
 
+            val perEngineVariants = List(
+                "Match_Phone_Number_in_Long_Text"                 -> "Match A hit",
+                "Fail_to_Match_Phone_Number_in_Long_Text"         -> "Match A miss",
+                "Locate_Phone_Number_in_Long_Text"                -> "Loc A hit",
+                "Fail_to_Locate_Phone_Number_in_Long_Text"        -> "Loc A miss",
+                "Match_Phone_Number_in_Long_Unicode_Text"         -> "Match U hit",
+                "Fail_to_Match_Phone_Number_in_Long_Unicode_Text" -> "Match U miss"
+            )
+            val perEngineBenchSet = perEngineVariants.map(_._1).toSet
+
             import plotly.*
             import plotly.element.*
             import plotly.layout.*
@@ -30,6 +40,12 @@ package worldofregex {
             (new java.io.File("plots")).mkdir()
 
             val benchmarks=loadBenchmarks(filename)
+            val runDate = {
+                val mtime = new java.io.File(filename).lastModified()
+                java.time.Instant.ofEpochMilli(mtime)
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            }
             val zName2Rows=
                 benchmarks.filter(r => r("Mode")=="thrpt"  && r("Score").toDouble>0 && !skipSet.contains(r("Param: factoryName"))).
                 groupBy(_("Benchmark")).toList.sortBy(_._1) 
@@ -48,41 +64,54 @@ package worldofregex {
             val allBenchmarkNames=zName2Rows.map(_._1) ++ tName2Rows.map(_._1);
             val fileNames=allBenchmarkNames.map(n=> benchname2Filename(n))
 
-            val prefetches= fileNames.map{fn=> s"""<link rel="prefetch" href="$fn"/>"""}.mkString
+            val perEngineEngines = benchmarks
+                .filter(r => r("Mode") == "thrpt"
+                          && perEngineBenchSet.contains(lastSegment(r("Benchmark")))
+                          && !skipSet.contains(r("Param: factoryName")))
+                .map(_("Param: factoryName")).distinct.sorted
+            val perEngineFileNames = perEngineEngines.map(e => s"Engine_$e.html")
 
-            val links= allBenchmarkNames.
+            val prefetches= (fileNames ++ perEngineFileNames).map{fn=> s"""<link rel="prefetch" href="$fn"/>"""}.mkString
+
+            val benchLinks= allBenchmarkNames.
                 map{s=> s"""<li><a href="${benchname2Filename(s)}">${lastSegment(s).replaceAll("_"," ")}</a></li>"""}
-            val linksList=links.mkString("<ul>","","</ul>");
-            val linksListWithMenu=links.mkString("""<ul><li><a href="index.html">Menu</a></li>""","","</ul>");
+            val engineLinks = perEngineEngines.
+                map{e => s"""<li><a href="Engine_$e.html">$e</a></li>"""}
+            val linksListWithMenu=
+                benchLinks.mkString("""<ul><li><a href="index.html">Menu</a></li>""","","</ul>") +
+                (if engineLinks.nonEmpty
+                 then engineLinks.mkString("<h2>Per-Engine Comparisons</h2><ul>","","</ul>")
+                 else "")
 
 
             def writeToFile(filename: String, content: String): Unit = {
                 scala.util.Using(new java.io.PrintWriter(filename))(_.write(content)).get
             }
 
-            def title(name:String)= {
-                def formTitle(h1:String,h2:String="",h3:String="") = {
-                    val q2=h2.replaceAll("""̈\\""","""&Backslash;""") 
-                    s"""<b>${h1.replaceAll("_"," ")}</b><br>${q2}<br><sup>${h3}</sup>"""
-                }
+            val benchDescriptions: Map[String, (String, String)] = Map(
+                "DotStar_vs_Long_Text"                              -> ("/.*/ vs ⟨random ascii printable string⟩", "higher is better"),
+                "Match_Phone_Number_in_Long_Text"                   -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random ascii printable string⟩⟨phoneNumber⟩""", "higher is better"),
+                "Fail_to_Match_Phone_Number_in_Long_Text"           -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""", "higher is better"),
+                "Match_Phone_Number_in_Long_Unicode_Text"           -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩⟨phoneNumber⟩""", "higher is better"),
+                "Fail_to_Match_Phone_Number_in_Long_Unicode_Text"   -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩""", "higher is better"),
+                "Locate_Phone_Number_in_Long_Text"                  -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ ⟨random ascii printable string⟩⟨phoneNumber⟩""", "higher is better"),
+                "Fail_to_Locate_Phone_Number_in_Long_Text"          -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""", "higher is better"),
+                "Compile_Long_Pattern"                              -> ("""/word1|word2|word3.../""", "higher is better"),
+                "Locate_All_Torture_Test"                           -> ("repeatedly: /a(.*X)?/ vs a+", "higher is better"),
+                "Match_ABC_in_Long_Text"                            -> ("/[ -~]*ABCDEFGHIJKLMNZ/ vs <ascii printable> \"ABCDEFGHIJKLMNZ\"", "higher is better"),
+                "Backtrack_Torture_Test"                            -> ("/(a?)ᴺaᴺ/ vs aᴺ", "lower is better (DFAs and JITrex are too fast to measure)")
+            )
 
-                name match {
-                    case "DotStar_vs_Long_Text" => formTitle(name, "/.*/ vs ⟨random ascii printable string⟩", "higher is better")
-                    case "Match_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random ascii printable string⟩⟨phoneNumber⟩""","higher is better")
-                    case "Fail_to_Match_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""","higher is better")
-                    case "Match_Phone_Number_in_Long_Unicode_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩⟨phoneNumber⟩""","higher is better")
-                    case "Fail_to_Match_Phone_Number_in_Long_Unicode_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩""","higher is better")
-                    case "Locate_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ ⟨random ascii printable string⟩⟨phoneNumber⟩""","higher is better")
-                    case "Fail_to_Locate_Phone_Number_in_Long_Text" => formTitle(name, """/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""","higher is better")
-                    case "Compile_Long_Pattern" => formTitle(name, """/word1|word2|word3.../""","higher is better")
-                    case "Locate_All_Torture_Test" => formTitle(name, "repeatedly: /a(.*X)?/ vs a+", "higher is better")
-                    case "Match_ABC_in_Long_Text" => formTitle(name, "/[ -~]*ABCDEFGHIJKLMNZ/ vs <ascii printable> \"ABCDEFGHIJKLMNZ\"", "higher is better")
-                    case "Backtrack_Torture_Test" => formTitle(name, "/(a?)ᴺaᴺ/ vs aᴺ" , "lower is better (DFAs and JITrex are too fast to measure)")
-                    case _ => formTitle(name);
-                }
+            def description(name:String):String =
+                benchDescriptions.get(name).map(_._1.replaceAll("""̈\\""","""&Backslash;""")).getOrElse("")
+
+            def title(name:String):String = {
+                val (pattern, note) = benchDescriptions.getOrElse(name, ("",""))
+                val q2 = pattern.replaceAll("""̈\\""","""&Backslash;""")
+                s"""<b>${name.replaceAll("_"," ")}</b><br>${q2}<br><sup>${note}</sup>"""
             }
 
-            def html(name:String,engine2XYs:Iterable[(String,List[(Int,Double)])],xaxis:String, yaxis:String)={
+            def html(name:String,engine2XYs:Iterable[(String,List[(Int,Double)])],xaxis:String, yaxis:String, customTitle:Option[String]=None)={
                 import Plotly.*;
 
                 val traces={
@@ -93,7 +122,7 @@ package worldofregex {
                 }.toSeq
 
                 val layout = Layout(
-                    title = title(lastSegment(name)),
+                    title = customTitle.getOrElse(title(lastSegment(name))),
                     height = 800,
                     xaxis = Axis(title = xaxis, `type` = AxisType.Log),
                     yaxis = Axis(title = yaxis, `type` = AxisType.Log)
@@ -160,6 +189,28 @@ package worldofregex {
                             html(bench,engine2XYs,xaxis="Data Length (bytes)", yaxis="Throughput(bytes/s)"));
             }
 
+            /* Per-Engine Comparison Plots */
+            for (engine <- perEngineEngines) do {
+                val variantTraces: List[(String, List[(Int, Double)])] =
+                    perEngineVariants.map { case (benchSuffix, label) =>
+                        val xys = benchmarks.iterator
+                            .filter(r => r("Mode") == "thrpt"
+                                      && r("Score").toDouble > 0
+                                      && r("Param: factoryName") == engine
+                                      && lastSegment(r("Benchmark")) == benchSuffix)
+                            .map(r => (r("Param: index").toInt, r("Score").toDouble))
+                            .toList.sortBy(_._1)
+                            .map { case (i, s) => val len = 1 << i; (len, len.toDouble * s) }
+                        (label, xys)
+                    }.filter(_._2.nonEmpty)
+                val customTitle = s"<b>$engine</b><br>Phone-number throughput: {success|fail} × {match|locate}<br><sup>higher is better</sup>"
+                writeToFile(s"plots/Engine_$engine.html",
+                    html(s"Engine_$engine", variantTraces,
+                         xaxis = "Data Length (bytes)",
+                         yaxis = "Throughput(bytes/s)",
+                         customTitle = Some(customTitle)))
+            }
+
             /* Speed Tests */
             for (case (bench,rows) <- tName2Rows) do {
 
@@ -173,38 +224,147 @@ package worldofregex {
 
 
 
+            def fmtThroughput(bps:Double):String =
+                if bps >= 1e9 then f"${bps/1e9}%.2f GB/s"
+                else if bps >= 1e6 then f"${bps/1e6}%.0f MB/s"
+                else if bps >= 1e3 then f"${bps/1e3}%.0f KB/s"
+                else f"$bps%.0f B/s"
+
+            def heatColor(value:Double, lo:Double, hi:Double):String =
+                if value <= 0 || hi <= lo then "#ffffff"
+                else {
+                    val t = (math.log(value) - math.log(lo)) / (math.log(hi) - math.log(lo))
+                    val lightness = (92 - 50 * t).toInt
+                    s"hsl(120, 55%, $lightness%)"
+                }
+
+            // For each throughput benchmark: (shortName, maxIdxBytes, sortedTopEngines)
+            val winnersRows = zName2Rows.map { case (bench, rows) =>
+                val short = lastSegment(bench)
+                val maxIdx = rows.map(_("Param: index").toInt).max
+                val len = 1 << maxIdx
+                val ranked = rows.filter(_("Param: index").toInt == maxIdx)
+                    .map(r => (r("Param: factoryName"), r("Score").toDouble * len))
+                    .sortBy(-_._2)
+                (short, len, ranked)
+            }
+
+            val winnersHtml = {
+                val body = winnersRows.map { case (short, len, ranked) =>
+                    val cells = (0 until 3).map { i =>
+                        if i < ranked.length then {
+                            val (eng, bps) = ranked(i)
+                            s"""<td><a href="Engine_${eng}.html">${eng}</a> <small>(${fmtThroughput(bps)})</small></td>"""
+                        } else "<td></td>"
+                    }.mkString
+                    val sizeLabel = if len >= (1<<20) then s"${len>>20} MB" else if len >= (1<<10) then s"${len>>10} KB" else s"$len B"
+                    s"""<tr><td><a href="${short}.html">${short.replaceAll("_"," ")}</a><br><small>at $sizeLabel</small></td>$cells</tr>"""
+                }.mkString
+                s"""<h2>Throughput Winners</h2>
+                |<p class="hint">Top three engines on each throughput benchmark, evaluated at the largest input size measured.</p>
+                |<table class="winners">
+                |<thead><tr><th>Benchmark</th><th>1st</th><th>2nd</th><th>3rd</th></tr></thead>
+                |<tbody>$body</tbody>
+                |</table>""".stripMargin
+            }
+
+            // Scorecard: (engine, variantBenchSuffix) -> bytes/sec at the engine's largest available index
+            val scorecard: Map[(String,String), Double] =
+                benchmarks.filter(r =>
+                    r("Mode") == "thrpt" &&
+                    r("Score").toDouble > 0 &&
+                    perEngineBenchSet.contains(lastSegment(r("Benchmark"))) &&
+                    !skipSet.contains(r("Param: factoryName"))
+                ).groupBy(r => (r("Param: factoryName"), lastSegment(r("Benchmark"))))
+                 .map { case (k, rs) =>
+                     val maxIdx = rs.map(_("Param: index").toInt).max
+                     val bps = rs.filter(_("Param: index").toInt == maxIdx)
+                         .map(r => r("Score").toDouble * (1 << maxIdx)).max
+                     k -> bps
+                 }
+
+            val colStats: Map[String, (Double, Double)] =
+                perEngineVariants.map { case (suffix, _) =>
+                    val vals = perEngineEngines.flatMap(e => scorecard.get((e, suffix)))
+                    suffix -> (if vals.isEmpty then (0.0, 0.0) else (vals.min, vals.max))
+                }.toMap
+
+            val scorecardHtml = {
+                val headerCells = perEngineVariants.map { case (_, label) => s"<th>${label}</th>" }.mkString
+                val rows = perEngineEngines.map { engine =>
+                    val cells = perEngineVariants.map { case (suffix, _) =>
+                        scorecard.get((engine, suffix)) match {
+                            case Some(bps) =>
+                                val (lo, hi) = colStats(suffix)
+                                s"""<td style="background-color:${heatColor(bps, lo, hi)}">${fmtThroughput(bps)}</td>"""
+                            case None => """<td class="na">—</td>"""
+                        }
+                    }.mkString
+                    s"""<tr><th class="rowhead"><a href="Engine_${engine}.html">${engine}</a></th>$cells</tr>"""
+                }.mkString
+                s"""<h2>Phone-Number Scorecard</h2>
+                |<p class="hint">Throughput at each engine's largest measured input. Cells are color-coded by column (log scale: darker = faster). Click an engine to see its full {match|locate} × {success|fail} chart.</p>
+                |<table class="scorecard">
+                |<thead><tr><th>Engine</th>$headerCells</tr></thead>
+                |<tbody>$rows</tbody>
+                |</table>""".stripMargin
+            }
+
+            val benchListHtml = {
+                val items = allBenchmarkNames.map { name =>
+                    val short = lastSegment(name)
+                    val desc = description(short)
+                    val descLine = if desc.nonEmpty then s"""<div class="bench-desc">${desc}</div>""" else ""
+                    s"""<li><a href="${benchname2Filename(name)}">${short.replaceAll("_"," ")}</a>$descLine</li>"""
+                }.mkString
+                s"""<h2>All Benchmarks</h2><ul class="bench-list">$items</ul>"""
+            }
+
+            val engineListHtml = {
+                val items = perEngineEngines.map(e => s"""<li><a href="Engine_${e}.html">${e}</a></li>""").mkString
+                s"""<h2>Per-Engine Comparisons</h2><ul class="engine-list">$items</ul>"""
+            }
+
             writeToFile("plots/index.html",
                     s"""<!DOCTYPE html>
             |<html>
             |<head>
             |<meta charset="UTF-8">
             |<meta name="viewport" content="width=device-width, initial-scale=1.0">
-            |<meta name="view-transition" content="same-origin"> <!-- Opt-in --> 
+            |<meta name="view-transition" content="same-origin"> <!-- Opt-in -->
             |${prefetches}
-            |<title>Benchmarks</title>
+            |<title>JVM Regex Benchmarks</title>
             | <style>
-            |.chart {
-	      |  view-transition-name: chart-div; /* Unique identifier for transition */
-            |}
-            |@keyframes fade-in {
-            | from { opacity: 0; }
-            | to { opacity: 1; }
-            |}
-            |a {
-            | display: block;
-            | text-align: left;
-            | margin-top: 20px;
-            | color: #0066cc;
-            | text-decoration: none;
-            | }
-            |::view-transition-new(root) {
-            | animation: fade-in 0.9s ease;
-            | }
+            |body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 1100px; margin: 1em auto; padding: 0 1em; color: #222; }
+            |h1 { margin-bottom: 0.2em; }
+            |h2 { margin-top: 2em; border-bottom: 1px solid #ddd; padding-bottom: 0.3em; }
+            |a { color: #0066cc; text-decoration: none; }
+            |a:hover { text-decoration: underline; }
+            |p.hint { color: #555; font-size: 0.9em; margin-top: 0; }
+            |table { border-collapse: collapse; margin: 1em 0; font-size: 0.92em; }
+            |th, td { padding: 4px 10px; text-align: left; border: 1px solid #ddd; }
+            |th { background: #f4f4f4; font-weight: 600; }
+            |table.winners td small { color: #777; }
+            |table.scorecard td { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; text-align: right; }
+            |table.scorecard th.rowhead { text-align: left; background: #f9f9f9; }
+            |table.scorecard td.na { color: #aaa; text-align: center; background: #fafafa; }
+            |ul.bench-list { list-style: none; padding-left: 0; }
+            |ul.bench-list li { margin-bottom: 0.9em; }
+            |ul.bench-list .bench-desc { font-size: 0.85em; color: #666; margin-left: 1.2em; font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; }
+            |ul.engine-list { list-style: none; padding-left: 0; columns: 4; column-gap: 1.5em; }
+            |ul.engine-list li { break-inside: avoid; margin-bottom: 0.3em; }
+            |::view-transition-new(root) { animation: fade-in 0.9s ease; }
+            |@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
             |</style>
             |</head>
             |<body>
-            |<p>Benchmark code and descriptions are at <a href="https://github.com/henryware/jvm-regex-benchmarks">https://github.com/henryware/jvm-regex-benchmarks</a></p>
-            |${linksList}
+            |<h1>JVM Regex Benchmarks</h1>
+            |<p>Throughput and latency comparison across JVM-accessible regex engines. Benchmark code at <a href="https://github.com/henryware/jvm-regex-benchmarks">github.com/henryware/jvm-regex-benchmarks</a>.</p>
+            |<p class="hint">Results from benchmark run on <b>${runDate}</b>.</p>
+            |$winnersHtml
+            |$scorecardHtml
+            |$benchListHtml
+            |$engineListHtml
             |</body>
             |</html>
        """.stripMargin)

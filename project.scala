@@ -77,6 +77,8 @@
 
 //> using jar lib/needle-compiler-0.0.1.jar
 //> using jar lib/needle-types-0.0.1.jar
+// Versions below are pinned to what Needle 0.0.1 requires; do not upgrade
+// (newer versions are incompatible). Outdated-dep hints from scala-cli are expected.
 //> using dep com.justinblank:mako:0.0.4
 //> using dep org.apache.commons:commons-lang3:3.8
 //> using dep net.bytebuddy:byte-buddy:1.10.20
