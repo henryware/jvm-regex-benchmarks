@@ -11,6 +11,7 @@ package worldofregex;
 
 object BricsWalk extends RegexEngine {
     val name="BricsWalk"
+    val version=LibraryVersion.fromClass(classOf[dk.brics.automaton.RegExp])
 
     import dk.brics.automaton.BricsNfaAutomaton.WalkAutomaton;
     import dk.brics.automaton.BricsUtils.auto;

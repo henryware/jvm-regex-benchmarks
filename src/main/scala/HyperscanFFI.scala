@@ -26,6 +26,18 @@ object HyperscanFFI extends RegexEngine {
     private val linker = Linker.nativeLinker()
     private val lib = SymbolLookup.libraryLookup("libhs.so", Arena.global())
 
+    // const char *hs_version(void)
+    private val hs_version_h: MethodHandle = linker.downcallHandle(
+        lib.find("hs_version").orElseThrow(() => new RuntimeException("Symbol not found: hs_version")),
+        FunctionDescriptor.of(ADDRESS)
+    )
+
+    lazy val version: String = {
+        val seg = hs_version_h.invoke().asInstanceOf[MemorySegment]
+        if (seg == MemorySegment.NULL || seg.address() == 0) ""
+        else seg.reinterpret(256).getString(0)
+    }
+
     private def lookup(name: String): MemorySegment =
         lib.find(name).orElseThrow(() => new RuntimeException(s"Symbol not found: $name"))
 

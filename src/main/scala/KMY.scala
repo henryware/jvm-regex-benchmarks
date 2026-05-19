@@ -3,6 +3,9 @@ package worldofregex;
 
 object KMY extends RegexEngine{
     val name="KMY"
+    // jint.jar carries no version metadata (Maven-less, manifest only has Manifest-Version)
+    // and the filename is bare "jint.jar", so we hardcode the version from project.scala.
+    val version="0.1.2"
 
     import kmy.regex.parser.*
     import kmy.regex.tree.*

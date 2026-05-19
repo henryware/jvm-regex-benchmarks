@@ -15,6 +15,7 @@ import Util.doWhile;
 
 object BricsScreen extends RegexEngine {
     val name="BricsScreen"
+    val version=LibraryVersion.fromClass(classOf[dk.brics.automaton.RegExp])
 
     import dk.brics.automaton.{RunAutomaton, RegExp, BasicAutomata}
     import dk.brics.automaton.BricsUtils.*;

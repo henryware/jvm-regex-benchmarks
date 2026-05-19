@@ -4,6 +4,7 @@ import worldofregex.Util.manglePattern
 
 object DkBrics extends RegexEngine {
     val name="DkBrics"
+    val version=LibraryVersion.fromClass(classOf[dk.brics.automaton.RegExp])
     import dk.brics.automaton.RegExp // Import RegExp to access flags
 
     def compile(pattern:String):Regex ={

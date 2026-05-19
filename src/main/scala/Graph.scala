@@ -71,6 +71,23 @@ package worldofregex {
                 .map(_("Param: factoryName")).distinct.sorted
             val perEngineFileNames = perEngineEngines.map(e => s"Engine_$e.html")
 
+            // Reflectively load each engine and ask for its version; missing
+            // FFI native libs (or any other failure) fall back to blank.
+            def loadVersion(engineName: String): String =
+                try {
+                    val cls = Class.forName("worldofregex." + engineName + "$")
+                    cls.getField("MODULE$").get(null).asInstanceOf[RegexEngine].version
+                } catch { case _: Throwable => "" }
+            val engineVersions: Map[String, String] =
+                perEngineEngines.map(e => e -> loadVersion(e)).toMap
+            def versionSpan(engine: String): String =
+                engineVersions.getOrElse(engine, "") match {
+                    case "" => ""
+                    case v  =>
+                        val prefix = if v.headOption.exists(_.isDigit) then "v" else ""
+                        s" <small>$prefix$v</small>"
+                }
+
             val prefetches= (fileNames ++ perEngineFileNames).map{fn=> s"""<link rel="prefetch" href="$fn"/>"""}.mkString
 
             val benchLinks= allBenchmarkNames.
@@ -203,7 +220,7 @@ package worldofregex {
                             .map { case (i, s) => val len = 1 << i; (len, len.toDouble * s) }
                         (label, xys)
                     }.filter(_._2.nonEmpty)
-                val customTitle = s"<b>$engine</b><br>Phone-number throughput: {success|fail} × {match|locate}<br><sup>higher is better</sup>"
+                val customTitle = s"<b>$engine</b>${versionSpan(engine)}<br>Phone-number throughput: {success|fail} × {match|locate}<br><sup>higher is better</sup>"
                 writeToFile(s"plots/Engine_$engine.html",
                     html(s"Engine_$engine", variantTraces,
                          xaxis = "Data Length (bytes)",
@@ -321,7 +338,9 @@ package worldofregex {
             }
 
             val engineListHtml = {
-                val items = perEngineEngines.map(e => s"""<li><a href="Engine_${e}.html">${e}</a></li>""").mkString
+                val items = perEngineEngines.map(e =>
+                    s"""<li><a href="Engine_${e}.html">${e}</a>${versionSpan(e)}</li>"""
+                ).mkString
                 s"""<h2>Per-Engine Comparisons</h2><ul class="engine-list">$items</ul>"""
             }
 

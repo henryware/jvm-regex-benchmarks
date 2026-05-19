@@ -10,6 +10,11 @@
 
 extern "C" {
 
+/* Build-time identifier for the shim. RE2 itself has no version macro. */
+const char *re2c_version() {
+    return "re2 (built " __DATE__ ")";
+}
+
 /* Compile a pattern. Returns opaque pointer to RE2 object (or nullptr). */
 void *re2c_compile(const char *pattern) {
     RE2::Options opts;

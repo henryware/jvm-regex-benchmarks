@@ -23,6 +23,7 @@ import worldofregex.Util.manglePattern
 
 object Amygdalum extends RegexEngine {
     val name="Amygdalum"
+    val version=LibraryVersion.fromClass(classOf[net.amygdalum.patternsearchalgorithms.pattern.Pattern])
 
     def compile(pattern:String):Regex ={
         val mangled = manglePattern(pattern)

@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets
 
 object JoniUTF16 extends RegexEngine {
     val name = "JoniUTF16"
+    val version = LibraryVersion.fromClass(classOf[org.joni.Regex])
 
     import org.joni.{Regex => JoniRegex, Matcher => JoniMatcher, Option => JoniOption}
     import org.jcodings.specific.UTF16LEEncoding

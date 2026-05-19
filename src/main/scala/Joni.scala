@@ -8,6 +8,7 @@ package worldofregex
 
 object Joni extends RegexEngine {
     val name="Joni"
+    val version=LibraryVersion.fromClass(classOf[org.joni.Regex])
 
     import org.joni.{Regex => JoniRegex, Matcher => JoniMatcher, Option => JoniOption}
     import org.jcodings.specific.UTF8Encoding;

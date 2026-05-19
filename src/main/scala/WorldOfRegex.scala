@@ -4,6 +4,8 @@ package worldofregex {
     trait RegexEngine{
         def name:String;
 
+        def version:String
+
         def compile(pattern:String):Regex
     }
 

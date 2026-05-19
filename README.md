@@ -1,3 +1,5 @@
+All plots are published at https://henryware.github.io/jvm-regex-benchmarks
+
 # Overview
 
 Speed test of various JVM regex libraries and C libraries callable
@@ -135,7 +137,7 @@ The libraries are widely used C/C++ libraries called via the JVM's FFI.
   from `O(N²)` to `O(N)`.  Costs vs stock Brics: extra compile time
   and memory (two automata) and `O(N)` runtime space.  This trick is
   only possible because Brics exposes its regular-language algebra.
-
+  
 ### Not (yet) contenders
 
 - **Lucerne** seems to use Brics with less tooling, so I didn't test it

@@ -6,6 +6,7 @@ import worldofregex.*
 
 object Bogus extends RegexEngine {
     def name:String="Bogus"
+    def version:String="0"
 
     def compile(pattern:String):Regex= new Regex{
 

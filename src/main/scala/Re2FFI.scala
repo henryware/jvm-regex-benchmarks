@@ -19,6 +19,18 @@ object Re2FFI extends RegexEngine {
         java.nio.file.Path.of("lib/libre2_c.so").toAbsolutePath, Arena.global()
     )
 
+    // const char *re2c_version(void)
+    private val re2c_version_h: MethodHandle = linker.downcallHandle(
+        lib.find("re2c_version").orElseThrow(() => new RuntimeException("Symbol not found: re2c_version")),
+        FunctionDescriptor.of(ADDRESS)
+    )
+
+    lazy val version: String = {
+        val seg = re2c_version_h.invoke().asInstanceOf[MemorySegment]
+        if (seg == MemorySegment.NULL || seg.address() == 0) ""
+        else seg.reinterpret(256).getString(0)
+    }
+
     private def lookup(name: String): MemorySegment =
         lib.find(name).orElseThrow(() => new RuntimeException(s"Symbol not found: $name"))
 

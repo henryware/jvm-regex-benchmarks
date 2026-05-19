@@ -2,6 +2,7 @@ package worldofregex;
 
 object MonqJFA extends RegexEngine {
     val name="MonqJFA"
+    val version=LibraryVersion.fromClass(classOf[monq.jfa.Regexp])
     import monq.jfa.*;
     def compile(pattern:String):Regex ={
         val startPin= pattern(0)=='^'

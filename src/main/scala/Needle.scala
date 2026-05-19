@@ -22,6 +22,7 @@ import worldofregex.Util.manglePattern
 
 object Needle extends RegexEngine {
     val name="Needle"
+    val version=LibraryVersion.fromClass(classOf[com.justinblank.strings.DFACompiler])
 
     /* Each call to DFACompiler.compile defines a new JVM class — the class
      * name must be unique within the classloader for the lifetime of the

@@ -17,6 +17,27 @@ object Pcre2FFI extends RegexEngine {
     private val linker = Linker.nativeLinker()
     private val lib = SymbolLookup.libraryLookup("libpcre2-8.so", Arena.global())
 
+    // int pcre2_config_8(uint32_t what, void *where)
+    private val pcre2_config: MethodHandle = linker.downcallHandle(
+        lib.find("pcre2_config_8").orElseThrow(() => new RuntimeException("Symbol not found: pcre2_config_8")),
+        FunctionDescriptor.of(JAVA_INT, JAVA_INT, ADDRESS)
+    )
+    private val PCRE2_CONFIG_VERSION = 11
+
+    lazy val version: String = {
+        val arena = Arena.ofConfined()
+        try {
+            val size = pcre2_config.invoke(PCRE2_CONFIG_VERSION, MemorySegment.NULL).asInstanceOf[Int]
+            if (size <= 0) "" else {
+                val buf = arena.allocate(size.toLong)
+                pcre2_config.invoke(PCRE2_CONFIG_VERSION, buf)
+                buf.reinterpret(size.toLong).getString(0)
+            }
+        } finally {
+            arena.close()
+        }
+    }
+
     private def lookup(name: String): MemorySegment =
         lib.find(name).orElseThrow(() => new RuntimeException(s"Symbol not found: $name"))
 
