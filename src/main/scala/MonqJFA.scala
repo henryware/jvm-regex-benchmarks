@@ -26,7 +26,7 @@ object MonqJFA extends RegexEngine {
                 if (startPin && endPin){
                     hasWholeMatch(txt);
                 } else {
-                    findMatchIn(txt,0) != None
+                    findMatchIn(txt,0).isDefined
                 }
         
             def findMatchIn(txt:String, index:Int):Option[Location]={

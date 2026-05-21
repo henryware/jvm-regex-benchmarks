@@ -121,7 +121,7 @@ object Joni extends RegexEngine {
         /** Returns an iterator over all non-overlapping matches in the string */
         def locateAllMatchIn(txt: String): Iterator[Location] = {
             val finder=Finder(txt)
-            Iterator.continually(finder.findMatch()).takeWhile(_ != None).flatten
+            Iterator.continually(finder.findMatch()).takeWhile(_.isDefined).flatten
         }
 
         def replaceAllIn(txt: String, replacement: String): String= ???

@@ -107,7 +107,7 @@ package RBench {
         @Benchmark
         def Locate_Phone_Number_in_Long_Text()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (phoneNumber.locateFirstMatchIn(LONG_TEXT_PN(index)) == None){
+            else if (phoneNumber.locateFirstMatchIn(LONG_TEXT_PN(index)).isEmpty){
                     1
             } else {
                 0
@@ -117,7 +117,7 @@ package RBench {
         @Benchmark
         def Fail_to_Locate_Phone_Number_in_Long_Text()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (phoneNumber.locateFirstMatchIn(LONG_TEXT(index)) == None){
+            else if (phoneNumber.locateFirstMatchIn(LONG_TEXT(index)).isEmpty){
                     1
             } else {
                 0
@@ -261,7 +261,7 @@ package RBench {
             if (unavailable) -1
             else if (index>=20) {
                 -1  // too slow to run
-            } else if (aaa.locateFirstMatchIn(AAA(index)) == None){
+            } else if (aaa.locateFirstMatchIn(AAA(index)).isEmpty){
                 1
             } else {
                 0

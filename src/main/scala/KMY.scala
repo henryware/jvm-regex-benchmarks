@@ -72,7 +72,7 @@ object KMY extends RegexEngine{
             val arr=txt.toCharArray
             re.init(arr,0,arr.length)
             Iterator.continually{if re.search then Some(Location(re.getMatchStart,re.getMatchEnd)) else None}.
-                takeWhile(_ != None).flatten
+                takeWhile(_.isDefined).flatten
         }
 
     }

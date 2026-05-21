@@ -63,7 +63,7 @@ trait StandardEngine extends RegexEngine {
 
         def locateAllMatchIn(txt:String):Iterator[Location]={
             val m=pmatcher(rx,txt)
-            Iterator.continually(findMatch(m)).takeWhile(_ != None).flatten
+            Iterator.continually(findMatch(m)).takeWhile(_.isDefined).flatten
         }
 
     }
