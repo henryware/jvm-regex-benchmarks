@@ -51,26 +51,14 @@ object Amygdalum extends RegexEngine {
                 else None
             }
 
-            /* The library's find() does not advance past zero-width matches,
-             * so we drive progression ourselves: match against substrings and
-             * always advance at least one position past the start of each
-             * reported match.
+            /* Since 0.1.4 the library's find() advances past zero-width
+             * matches on its own, so a single matcher drives the iteration.
              */
             def locateAllMatchIn(txt:String):Iterator[Location]={
-                var index=0
-                def nextMatch():Option[Location]={
-                    if (index>txt.length) None
-                    else {
-                        val m=searchPat.matcher(txt.substring(index))
-                        if (m.find()){
-                            val s=m.start().toInt + index
-                            val e=m.end().toInt + index
-                            index = math.max(e, s+1)
-                            Some(Location(s,e))
-                        } else None
-                    }
-                }
-                Iterator.continually(nextMatch()).takeWhile(_.isDefined).flatten
+                val m=searchPat.matcher(txt)
+                Iterator.continually(
+                    if (m.find()) Some(Location(m.start().toInt, m.end().toInt)) else None
+                ).takeWhile(_.isDefined).flatten
             }
         }
     }
