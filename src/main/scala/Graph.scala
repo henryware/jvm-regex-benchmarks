@@ -200,10 +200,14 @@ package worldofregex {
                 val engine2XYs=for ((engine,indexScores) <- engine2IndexScores) yield {
                     (engine,
                      indexScores.map{case (i,s) => val len=1<<i; (len, len.toDouble*s)}
-                    ) 
+                    )
+                }
+                val xaxis = lastSegment(bench) match {
+                    case "Compile_Long_Pattern" => "Pattern length (chars)"
+                    case _                     => "Data Length (chars)"
                 }
                 writeToFile("plots/"+benchname2Filename(bench),
-                            html(bench,engine2XYs,xaxis="Data Length (bytes)", yaxis="Throughput(bytes/s)"));
+                            html(bench,engine2XYs,xaxis=xaxis, yaxis="Throughput(chars/s)"));
             }
 
             /* Per-Engine Comparison Plots */
@@ -223,8 +227,8 @@ package worldofregex {
                 val customTitle = s"<b>$engine</b>${versionSpan(engine)}<br>Phone-number throughput: {success|fail} × {match|locate}<br><sup>higher is better</sup>"
                 writeToFile(s"plots/Engine_$engine.html",
                     html(s"Engine_$engine", variantTraces,
-                         xaxis = "Data Length (bytes)",
-                         yaxis = "Throughput(bytes/s)",
+                         xaxis = "Data Length (chars)",
+                         yaxis = "Throughput(chars/s)",
                          customTitle = Some(customTitle)))
             }
 
@@ -235,17 +239,21 @@ package worldofregex {
                 val engine2XYs=rows.groupMap(_("Param: factoryName")){
                     h=> (h("Param: index").toInt,h("Score").toDouble)
                 }.toList.sortBy(_._1)
+                val xaxis = lastSegment(bench) match {
+                    case "Backtrack_Torture_Test" => "N (pattern depth = string length)"
+                    case _                        => "Data Length (chars)"
+                }
                 writeToFile("plots/"+benchname2Filename(bench),
-                            html(bench,engine2XYs,xaxis="Data Length (bytes)", yaxis="Time(s/op)"));
+                            html(bench,engine2XYs,xaxis=xaxis, yaxis="Time(s/op)"));
             }
 
 
 
-            def fmtThroughput(bps:Double):String =
-                if bps >= 1e9 then f"${bps/1e9}%.2f GB/s"
-                else if bps >= 1e6 then f"${bps/1e6}%.0f MB/s"
-                else if bps >= 1e3 then f"${bps/1e3}%.0f KB/s"
-                else f"$bps%.0f B/s"
+            def fmtThroughput(cps:Double):String =
+                if cps >= 1e9 then f"${cps/1e9}%.2f Gchars/s"
+                else if cps >= 1e6 then f"${cps/1e6}%.0f Mchars/s"
+                else if cps >= 1e3 then f"${cps/1e3}%.0f Kchars/s"
+                else f"$cps%.0f chars/s"
 
             def heatColor(value:Double, lo:Double, hi:Double):String =
                 if value <= 0 || hi <= lo then "#ffffff"
@@ -274,7 +282,7 @@ package worldofregex {
                             s"""<td><a href="Engine_${eng}.html">${eng}</a> <small>(${fmtThroughput(bps)})</small></td>"""
                         } else "<td></td>"
                     }.mkString
-                    val sizeLabel = if len >= (1<<20) then s"${len>>20} MB" else if len >= (1<<10) then s"${len>>10} KB" else s"$len B"
+                    val sizeLabel = if len >= (1<<20) then s"${len>>20} Mchars" else if len >= (1<<10) then s"${len>>10} Kchars" else s"$len chars"
                     s"""<tr><td><a href="${short}.html">${short.replaceAll("_"," ")}</a><br><small>at $sizeLabel</small></td>$cells</tr>"""
                 }.mkString
                 s"""<h2>Throughput Winners</h2>
@@ -285,7 +293,7 @@ package worldofregex {
                 |</table>""".stripMargin
             }
 
-            // Scorecard: (engine, variantBenchSuffix) -> bytes/sec at the engine's largest available index
+            // Scorecard: (engine, variantBenchSuffix) -> chars/sec at the engine's largest available index
             val scorecard: Map[(String,String), Double] =
                 benchmarks.filter(r =>
                     r("Mode") == "thrpt" &&
