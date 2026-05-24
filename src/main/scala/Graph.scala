@@ -37,7 +37,10 @@ package worldofregex {
             import plotly.element.*
             import plotly.layout.*
 
-            (new java.io.File("plots")).mkdir()
+            val plotsDir = new java.io.File("plots")
+            plotsDir.mkdir()
+            Option(plotsDir.listFiles((_, name) => name.startsWith("Engine_") && name.endsWith(".html")))
+                .toList.flatten.foreach(_.delete())
 
             val benchmarks=loadBenchmarks(filename)
             val runDate = {
