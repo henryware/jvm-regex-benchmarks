@@ -85,7 +85,7 @@ package worldofregex {
                     case "" => ""
                     case v  =>
                         val prefix = if v.headOption.exists(_.isDigit) then "v" else ""
-                        s" <small>$prefix$v</small>"
+                        s""" <span style="font-size:smaller">$prefix$v</span>"""
                 }
 
             val prefetches= (fileNames ++ perEngineFileNames).map{fn=> s"""<link rel="prefetch" href="$fn"/>"""}.mkString
@@ -125,7 +125,7 @@ package worldofregex {
             def title(name:String):String = {
                 val (pattern, note) = benchDescriptions.getOrElse(name, ("",""))
                 val q2 = pattern.replaceAll("""̈\\""","""&Backslash;""")
-                s"""<b>${name.replaceAll("_"," ")}</b><br>${q2}<br><sup>${note}</sup>"""
+                s"""<b>${name.replaceAll("_"," ")}</b><br>${q2}<br><span style="font-size:smaller">${note}</span>"""
             }
 
             def html(name:String,engine2XYs:Iterable[(String,List[(Int,Double)])],xaxis:String, yaxis:String, customTitle:Option[String]=None)={
@@ -155,7 +155,7 @@ package worldofregex {
                 |<meta name="view-transition" content="same-origin"> <!-- Opt-in --> 
                 |<link rel="prefetch"href="index.html"/>
                 |${prefetches}
-                |<title>${layout.title.getOrElse("plotly chart")}</title>
+                |<title>${lastSegment(name).replaceAll("_"," ")}</title>
                 | <style>
                 |.chart {
 	          |  view-transition-name: chart-div; /* Unique identifier for transition */
@@ -224,7 +224,7 @@ package worldofregex {
                             .map { case (i, s) => val len = 1 << i; (len, len.toDouble * s) }
                         (label, xys)
                     }.filter(_._2.nonEmpty)
-                val customTitle = s"<b>$engine</b>${versionSpan(engine)}<br>Phone-number throughput: {success|fail} × {match|locate}<br><sup>higher is better</sup>"
+                val customTitle = s"""<b>$engine</b>${versionSpan(engine)}<br>Phone-number throughput: {success|fail} × {match|locate}<br><span style="font-size:smaller">higher is better</span>"""
                 writeToFile(s"plots/Engine_$engine.html",
                     html(s"Engine_$engine", variantTraces,
                          xaxis = "Data Length (chars)",
