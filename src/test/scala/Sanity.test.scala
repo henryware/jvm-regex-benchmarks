@@ -23,7 +23,7 @@ class Sanity extends ScalaCheckSuite {
             None
         }
 
-    val ENGINES: List[RegexEngine] = List(BricsScreen, DkBrics, MonqJFA, JavaUtil, Re2J, Florian, Joni, JoniUTF16, KMY, BricsWalk, JiTrex, Amygdalum, Needle) ++
+    val ENGINES: List[RegexEngine] = List(BricsScreen, DkBrics, MonqJFA, JavaUtil, Re2J, Florian, Joni, JoniUTF16, KMY, BricsWalk, JiTrex, Amygdalum, Needle, MacroNeedle) ++
         List(tryEngine(Pcre2FFI), tryEngine(HyperscanFFI), tryEngine(Re2FFI)).flatten // :+ Bogus
 
     case class TestCase(pattern: String, text: String, whole: String, partial: String, first: String, all: String)
@@ -212,7 +212,7 @@ class Sanity extends ScalaCheckSuite {
     val anchoredEngines= Set("Joni", "JoniUTF16", "JavaUtil", "Re2J", "Florian", "Pcre2FFI", "Re2FFI")
     val submatchEngines = Set("Joni", "JoniUTF16", "JavaUtil", "Re2J", "Florian", "HarpoNFA", "HarpoInterp", "Pcre2FFI", "Re2FFI")
     val noSurrogatePairEngines = Set("KMY")
-    val dotMatchesNewlineEngines = posixEngines ++ Set("HyperscanFFI", "Needle")
+    val dotMatchesNewlineEngines = posixEngines ++ Set("HyperscanFFI", "Needle", "MacroNeedle")
 
     // Hyperscan reports all match endpoints (streaming DFA) — its locate
     // semantics differ from both greedy DFAs and Perl engines, so only

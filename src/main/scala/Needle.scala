@@ -17,7 +17,7 @@ package worldofregex;
   */
 
 import java.util.concurrent.atomic.AtomicLong
-import com.justinblank.strings.{DFACompiler, MatchResult}
+import com.justinblank.strings.{DFACompiler, Pattern, MatchResult}
 import worldofregex.Util.manglePattern
 
 object Needle extends RegexEngine {
@@ -37,15 +37,21 @@ object Needle extends RegexEngine {
         } catch {
             case e: Throwable => throw new RegexException(s"error compiling /${pattern}/ mangled as /${mangled}/",e);
         }
+        regexFromPattern(compiled, pattern, name)
+    }
 
+    /* Wrap a needle Pattern in the project's Regex trait.  Shared with the
+     * compile-time macro-baked path (worldofregex.macros.Needle) so the
+     * zero-width iteration logic lives in exactly one place. */
+    def regexFromPattern(compiled: Pattern, source: String, engine: String): Regex = {
         /* Probed once so locateAllMatchIn can emit the end-of-string empty
          * match without calling find(len, len), which throws in 0.0.1. */
         val acceptsEmpty = compiled.matcher("").matches()
 
         new Regex {
-            override def toString= s"Needle($pattern)"
+            override def toString= s"$engine($source)"
 
-            val engineName="Needle"
+            val engineName=engine
 
             def hasWholeMatch(txt:String):Boolean=compiled.matcher(txt).matches()
 

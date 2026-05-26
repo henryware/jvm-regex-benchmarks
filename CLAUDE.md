@@ -48,3 +48,5 @@ Test constants and patterns are in `src/main/scala/Constants.scala`.
 - 4-space indentation
 - Use munit for tests, scalacheck where appropriate
 - Self-documenting code over comments
+
+Don't mention co-authored by Claude in commit messages.

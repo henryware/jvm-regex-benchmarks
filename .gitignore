@@ -27,6 +27,9 @@ project/plugins/project/
 .ensime_cache/
 .ensime
 
+# CLAUDE
+.claude/
+
 .metals/
 .ammonite/
 metals.sbt
