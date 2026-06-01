@@ -25,11 +25,7 @@ object Re2FFI extends RegexEngine {
         FunctionDescriptor.of(ADDRESS)
     )
 
-    lazy val version: String = {
-        val seg = re2c_version_h.invoke().asInstanceOf[MemorySegment]
-        if (seg == MemorySegment.NULL || seg.address() == 0) ""
-        else seg.reinterpret(256).getString(0)
-    }
+    val version: String = "" // no way to get the real version
 
     private def lookup(name: String): MemorySegment =
         lib.find(name).orElseThrow(() => new RuntimeException(s"Symbol not found: $name"))

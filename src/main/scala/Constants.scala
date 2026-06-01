@@ -78,6 +78,20 @@ package worldofregex {
             s"""${ALMOST_LONG_UNICODE_TEXT(i)}(650) 253-0001."""
         }
 
+        // A decently complicated pattern over CJK text: a run of ideographs
+        // followed by a multi-char "company type" marker and an optional unit
+        // suffix.  Literal chars (no \u escapes) so the DFA engines accept it.
+        // The greedy [一-鿿]{2,8} overlaps the markers, forcing backtracking
+        // engines to back off where the DFAs find the match in one pass.
+        val CJK_LOCATE_PAT= """[一-鿿]{2,8}(?:株式会社|有限公司|股份有限公司)(?:第[0-9一-鿿]{1,3}号)?"""
+
+        // Embedded target that CJK_LOCATE_PAT matches: "東京" + "株式会社" + "第一号".
+        private val CJK_TARGET= "東京株式会社第一号"
+
+        val LONG_UNICODE_TEXT_CJK= Util.Memoize{ (i:Int) =>
+            s"""${ALMOST_LONG_UNICODE_TEXT(i)}$CJK_TARGET"""
+        }
+
         val ABCpat= """[ -~]*ABCDEFGHIJKLMNZ""";
 
         val LONG_TEXT_ABC= Util.Memoize{ (i:Int) =>

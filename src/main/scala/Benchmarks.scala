@@ -29,6 +29,7 @@ package RBench {
         var phoneNumber:Regex = uninitialized
         var abcEnd:Regex = uninitialized
         var star:Regex = uninitialized
+        var cjkComplex:Regex = uninitialized
 
         //@Param(Array("8","12","16"))
         @Param(Array("5","6","7","8","9","10","11","12","13","14","15","16", "17","18","19","20","21","22"))
@@ -58,6 +59,7 @@ package RBench {
             aaa=engine.compile(AAApat(index))
             ax=engine.compile(AXpat)
             abcEnd=engine.compile(ABCpat)
+            cjkComplex=engine.compile(CJK_LOCATE_PAT)
 
 
         }
@@ -148,6 +150,26 @@ package RBench {
         def Fail_to_Match_Phone_Number_in_Long_Unicode_Text()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.hasPartialMatch(LONG_UNICODE_TEXT(index))){
+                1
+            } else {
+                0
+            }
+        }
+
+        @Benchmark
+        def Locate_CJK_Pattern_in_Long_Unicode_Text()= {
+            if (unavailable) throw new RegexException("engine unavailable");
+            else if (cjkComplex.locateFirstMatchIn(LONG_UNICODE_TEXT_CJK(index)).isEmpty){
+                1
+            } else {
+                0
+            }
+        }
+
+        @Benchmark
+        def Fail_to_Locate_CJK_Pattern_in_Long_Unicode_Text()= {
+            if (unavailable) throw new RegexException("engine unavailable");
+            else if (cjkComplex.locateFirstMatchIn(LONG_UNICODE_TEXT(index)).isEmpty){
                 1
             } else {
                 0
