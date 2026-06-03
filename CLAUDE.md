@@ -38,9 +38,12 @@ Each regex library has an adapter implementing `RegexEngine`:
 
 ### Benchmarks (`src/main/scala/Benchmarks.scala`)
 Three JMH benchmark classes with different characteristics:
-- `ZBig`: Throughput tests on varying text lengths (normal speed)
-- `ZSmall`: Throughput tests that can be very slow
-- `TSmall`: Average time tests for backtracking torture tests (exponentially slow)
+- `Throughput`: Throughput tests on varying text lengths (normal speed)
+- `ThroughputSlow`: Throughput tests that can be very slow
+- `Latency`: Average time tests for backtracking torture tests (exponentially slow)
+
+Benchmark method names follow `Op_Pattern_Corpus_Outcome` (e.g. `Match_Phone_Ascii_Hit`,
+`Locate_Company_Cjk_Miss`); the `Outcome`/`Corpus` slots are dropped when not meaningful.
 
 Test constants and patterns are in `src/main/scala/Constants.scala`.
 

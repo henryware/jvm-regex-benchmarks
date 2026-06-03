@@ -24,12 +24,12 @@ package worldofregex {
             val skipSet=skipThese.toSet
 
             val perEngineVariants = List(
-                "Match_Phone_Number_in_Long_Text"                 -> "Match A hit",
-                "Fail_to_Match_Phone_Number_in_Long_Text"         -> "Match A miss",
-                "Locate_Phone_Number_in_Long_Text"                -> "Loc A hit",
-                "Fail_to_Locate_Phone_Number_in_Long_Text"        -> "Loc A miss",
-                "Match_Phone_Number_in_Long_Unicode_Text"         -> "Match U hit",
-                "Fail_to_Match_Phone_Number_in_Long_Unicode_Text" -> "Match U miss"
+                "Match_Phone_Ascii_Hit"   -> "Match A hit",
+                "Match_Phone_Ascii_Miss"  -> "Match A miss",
+                "Locate_Phone_Ascii_Hit"  -> "Loc A hit",
+                "Locate_Phone_Ascii_Miss" -> "Loc A miss",
+                "Match_Phone_Cjk_Hit"     -> "Match U hit",
+                "Match_Phone_Cjk_Miss"    -> "Match U miss"
             )
             val perEngineBenchSet = perEngineVariants.map(_._1).toSet
 
@@ -109,17 +109,19 @@ package worldofregex {
             }
 
             val benchDescriptions: Map[String, (String, String)] = Map(
-                "DotStar_vs_Long_Text"                              -> ("/.*/ vs ⟨random ascii printable string⟩", "higher is better"),
-                "Match_Phone_Number_in_Long_Text"                   -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random ascii printable string⟩⟨phoneNumber⟩""", "higher is better"),
-                "Fail_to_Match_Phone_Number_in_Long_Text"           -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""", "higher is better"),
-                "Match_Phone_Number_in_Long_Unicode_Text"           -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩⟨phoneNumber⟩""", "higher is better"),
-                "Fail_to_Match_Phone_Number_in_Long_Unicode_Text"   -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩""", "higher is better"),
-                "Locate_Phone_Number_in_Long_Text"                  -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ ⟨random ascii printable string⟩⟨phoneNumber⟩""", "higher is better"),
-                "Fail_to_Locate_Phone_Number_in_Long_Text"          -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""", "higher is better"),
-                "Compile_Long_Pattern"                              -> ("""/word1|word2|word3.../""", "higher is better"),
-                "Locate_All_Torture_Test"                           -> ("repeatedly: /a(.*X)?/ vs a+", "higher is better"),
-                "Match_ABC_in_Long_Text"                            -> ("/[ -~]*ABCDEFGHIJKLMNZ/ vs <ascii printable> \"ABCDEFGHIJKLMNZ\"", "higher is better"),
-                "Backtrack_Torture_Test"                            -> ("/(a?)ᴺaᴺ/ vs aᴺ", "lower is better (DFAs and JITrex are too fast to measure)")
+                "WholeMatch_DotStar_Ascii" -> ("/.*/ vs ⟨random ascii printable string⟩", "higher is better"),
+                "Match_Phone_Ascii_Hit"    -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random ascii printable string⟩⟨phoneNumber⟩""", "higher is better"),
+                "Match_Phone_Ascii_Miss"   -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""", "higher is better"),
+                "Match_Phone_Cjk_Hit"      -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩⟨phoneNumber⟩""", "higher is better"),
+                "Match_Phone_Cjk_Miss"     -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩""", "higher is better"),
+                "Locate_Phone_Ascii_Hit"   -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ ⟨random ascii printable string⟩⟨phoneNumber⟩""", "higher is better"),
+                "Locate_Phone_Ascii_Miss"  -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""", "higher is better"),
+                "Locate_Company_Cjk_Hit"   -> ("""/[一-鿿]{2,8}(?:株式会社|有限公司|股份有限公司)(?:第[0-9一-鿿]{1,3}号)?/ vs ⟨random CJK Unified Ideographs⟩⟨company name⟩""", "higher is better"),
+                "Locate_Company_Cjk_Miss"  -> ("""/[一-鿿]{2,8}(?:株式会社|有限公司|股份有限公司)(?:第[0-9一-鿿]{1,3}号)?/ vs ⟨random CJK Unified Ideographs⟩""", "higher is better"),
+                "Compile_Jumbo"            -> ("""/word1|word2|word3.../""", "higher is better"),
+                "LocateAll_Torture_Test"   -> ("repeatedly: /a(.*X)?/ vs a+", "higher is better"),
+                "Match_Abc_Ascii_Hit"      -> ("/[ -~]*ABCDEFGHIJKLMNZ/ vs <ascii printable> \"ABCDEFGHIJKLMNZ\"", "higher is better"),
+                "Backtrack_Torture_Test"   -> ("/(a?)ᴺaᴺ/ vs aᴺ", "lower is better (DFAs and JITrex are too fast to measure)")
             )
 
             def description(name:String):String =
@@ -206,8 +208,8 @@ package worldofregex {
                     )
                 }
                 val xaxis = lastSegment(bench) match {
-                    case "Compile_Long_Pattern" => "Pattern length (chars)"
-                    case _                     => "Data Length (chars)"
+                    case "Compile_Jumbo" => "Pattern length (chars)"
+                    case _               => "Data Length (chars)"
                 }
                 writeToFile("plots/"+benchname2Filename(bench),
                             html(bench,engine2XYs,xaxis=xaxis, yaxis="Throughput(chars/s)"));
@@ -244,7 +246,7 @@ package worldofregex {
                 }.toList.sortBy(_._1)
                 val xaxis = lastSegment(bench) match {
                     case "Backtrack_Torture_Test" => "N (pattern depth = string length)"
-                    case _                        => "Data Length (chars)"
+                    case _                      => "Data Length (chars)"
                 }
                 writeToFile("plots/"+benchname2Filename(bench),
                             html(bench,engine2XYs,xaxis=xaxis, yaxis="Time(s/op)"));

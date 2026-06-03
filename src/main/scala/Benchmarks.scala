@@ -6,9 +6,12 @@ import java.util.concurrent.TimeUnit
 package RBench {
 
 
-    /* ZBig contains the normal tests: throughput tests vs varying length texts
+    /* Throughput contains the normal tests: throughput tests vs varying length texts
      *
-     * These are not expected to be especially slow
+     * These are not expected to be especially slow.
+     *
+     * Class names sort so JMH runs them in increasing cost order:
+     * Latency (avgtime torture) < Throughput (normal) < ThroughputSlow (catastrophic).
      */
     @State(Scope.Benchmark)
     @Warmup(iterations = 2, time=3401, timeUnit=TimeUnit.MILLISECONDS)
@@ -16,7 +19,7 @@ package RBench {
     @Timeout(time = 10000, timeUnit = TimeUnit.MILLISECONDS)
     @BenchmarkMode(Array(Mode.Throughput))
     @Fork(1)
-    class ZBig{
+    class Throughput{
         import Constants._
 
         @Param(Array("KMY", "Joni", "JoniUTF16", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "HarpoDFA", "HarpoInterp", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
@@ -64,19 +67,19 @@ package RBench {
 
         }
 
-        // Engines whose Compile_Long_Pattern is especially slow
+        // Engines whose Compile_Jumbo is especially slow
         // Amygdalum (minutes to compile)  
         private val slowLongPatternCompile = Set("Amygdalum")
 
         @Benchmark
-        def Compile_Long_Pattern()= {
+        def Compile_Jumbo()= {
             if (unavailable || (slowLongPatternCompile(factoryName) && index >= 12)) throw new RegexException("engine unavailable");
             else engine.compile(JUMBOpattern(index))
         }
 
 
         @Benchmark
-        def DotStar_vs_Long_Text()= {
+        def WholeMatch_DotStar_Ascii()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (star.hasWholeMatch(LONG_TEXT_PN(index))){
                     1
@@ -87,7 +90,7 @@ package RBench {
 
 
         @Benchmark
-        def Match_Phone_Number_in_Long_Text()= {
+        def Match_Phone_Ascii_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.hasPartialMatch(LONG_TEXT_PN(index))){
                     1
@@ -97,7 +100,7 @@ package RBench {
         }
 
         @Benchmark
-        def Fail_to_Match_Phone_Number_in_Long_Text()= {
+        def Match_Phone_Ascii_Miss()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.hasPartialMatch(LONG_TEXT(index))){
                     1
@@ -107,7 +110,7 @@ package RBench {
         }
 
         @Benchmark
-        def Locate_Phone_Number_in_Long_Text()= {
+        def Locate_Phone_Ascii_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.locateFirstMatchIn(LONG_TEXT_PN(index)).isEmpty){
                     1
@@ -117,7 +120,7 @@ package RBench {
         }
 
         @Benchmark
-        def Fail_to_Locate_Phone_Number_in_Long_Text()= {
+        def Locate_Phone_Ascii_Miss()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.locateFirstMatchIn(LONG_TEXT(index)).isEmpty){
                     1
@@ -127,7 +130,7 @@ package RBench {
         }
 
         @Benchmark
-        def Match_ABC_in_Long_Text()= {
+        def Match_Abc_Ascii_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (abcEnd.hasPartialMatch(LONG_TEXT_ABC(index))){
                 1
@@ -137,7 +140,7 @@ package RBench {
         }
 
         @Benchmark
-        def Match_Phone_Number_in_Long_Unicode_Text()= {
+        def Match_Phone_Cjk_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.hasPartialMatch(LONG_UNICODE_TEXT_PN(index))){
                 1
@@ -147,7 +150,7 @@ package RBench {
         }
 
         @Benchmark
-        def Fail_to_Match_Phone_Number_in_Long_Unicode_Text()= {
+        def Match_Phone_Cjk_Miss()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (phoneNumber.hasPartialMatch(LONG_UNICODE_TEXT(index))){
                 1
@@ -157,7 +160,7 @@ package RBench {
         }
 
         @Benchmark
-        def Locate_CJK_Pattern_in_Long_Unicode_Text()= {
+        def Locate_Company_Cjk_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (cjkComplex.locateFirstMatchIn(LONG_UNICODE_TEXT_CJK(index)).isEmpty){
                 1
@@ -167,7 +170,7 @@ package RBench {
         }
 
         @Benchmark
-        def Fail_to_Locate_CJK_Pattern_in_Long_Unicode_Text()= {
+        def Locate_Company_Cjk_Miss()= {
             if (unavailable) throw new RegexException("engine unavailable");
             else if (cjkComplex.locateFirstMatchIn(LONG_UNICODE_TEXT(index)).isEmpty){
                 1
@@ -178,7 +181,7 @@ package RBench {
 
     }
 
-    /* ZSmall contains throughput tests vs varying length texts
+    /* ThroughputSlow contains throughput tests vs varying length texts
      *
      * These are potentially VERY VERY SLOW
      */
@@ -188,7 +191,7 @@ package RBench {
     @Timeout(time = 10000, timeUnit = TimeUnit.MILLISECONDS)
     @BenchmarkMode(Array(Mode.Throughput))
     @Fork(1)
-    class ZSmall {
+    class ThroughputSlow {
         import Constants._
 
         @Param(Array("KMY", "Joni", "JoniUTF16", "Florian", "MonqJFA", "BricsScreen", "DkBrics",  "JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "Pcre2FFI", "Re2FFI"))
@@ -223,7 +226,7 @@ package RBench {
         }
 
         @Benchmark
-        def Locate_All_Torture_Test()= {
+        def LocateAll_Torture_Test()= {
             if (unavailable) -1
             else if (index>17) {
                 -1  // too slow to run
@@ -237,7 +240,7 @@ package RBench {
         }
     }
 
-    /* TSmall contains timed tests
+    /* Latency contains timed (average-time) tests
      *
      * These are potentially VERY VERY VERY SLOW as index gets large
      */
@@ -247,7 +250,7 @@ package RBench {
     @Timeout(time = 10000, timeUnit = TimeUnit.MILLISECONDS)
     @BenchmarkMode(Array(Mode.AverageTime))
     @Fork(1)
-    class TSmall {
+    class Latency {
         import Constants._
 
         @Param(Array("KMY", "Joni", "JoniUTF16", "Florian", "MonqJFA","BricsScreen", "DkBrics","JavaUtil", "Re2J", "JiTrex", "Amygdalum", "Needle", "Pcre2FFI", "HyperscanFFI", "Re2FFI"))
