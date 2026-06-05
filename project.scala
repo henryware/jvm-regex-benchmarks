@@ -58,13 +58,12 @@
 //> using jar lib/jitrex-0.1.17.jar
 
 // ====
-// Pattern Search Algorithms (amygdalum) 0.1.4 released 2026
+// Pattern Search Algorithms (amygdalum) 1.5.0 released 2026
 // https://patternsearchalgorithms.amygdalum.net/
 // https://github.com/almondtools/patternsearchalgorithms
 // LGPL
 
-//> using dep net.amygdalum:patternsearchalgorithms:0.1.4
-
+//> using dep net.amygdalum:patternsearchalgorithms:1.5.0 
 
 // ====
 // Needle 0.0.1 release May 2024
