@@ -203,6 +203,8 @@ object BricsScreen extends RegexEngine {
              * implementation _here_ because the unscreened
              * implementation is used in DkBrics: no point in
              * repeating that here.
+             *
+             * This does always scan the whole string which is not great.
              */ 
             def locateFirstMatchIn(txt:String):Option[Location]={
                 locateAllMatchIn(txt).nextOption
