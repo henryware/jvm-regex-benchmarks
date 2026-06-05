@@ -38,6 +38,9 @@ leftmost/longest match.  The NFAs are more complicated: `a|b|ab` is
 not the same as `ab|a|b`.  When repeatedly matched against "ab" the
 first returns "a","b" and the second "ab".
 
+Some of the engines have a scan to identify interesting/uninteresting
+(sub)strings.
+
 # The Contenders
 
 Some are Jars, some are libraries.  Except for KMY and JITrex, all are
@@ -205,7 +208,7 @@ Does the regular expression match a subset of the string?  What are the location
 
 #### Line test
 
-A common regex uses case is work on lines of text of, say, 120 characters.   None of these benchmarks are like that.
+A common regex uses case is work on lines of text of, say, 120 characters.   None of these benchmarks are exactly like that.  We do, however, test against single lines of 64 and 128 chars.
 
 #### DFA Torture test
 For DFAs, compiling `/a(a|b){N}x/` is exponential in space.  Not currently tested or benchmarked.
