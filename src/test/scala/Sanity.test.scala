@@ -212,7 +212,7 @@ class Sanity extends ScalaCheckSuite {
     val anchoredEngines= Set("Joni", "JoniUTF16", "JavaUtil", "Re2J", "Florian", "Pcre2FFI", "Re2FFI")
     val submatchEngines = Set("Joni", "JoniUTF16", "JavaUtil", "Re2J", "Florian", "HarpoNFA", "HarpoInterp", "Pcre2FFI", "Re2FFI")
     val noSurrogatePairEngines = Set("KMY")
-    val dotMatchesNewlineEngines = posixEngines ++ Set("HyperscanFFI", "Needle", "MacroNeedle")
+    val dotMatchesNewlineEngines = posixEngines ++ Set("HyperscanFFI")
 
     // Hyperscan reports all match endpoints (streaming DFA) — its locate
     // semantics differ from both greedy DFAs and Perl engines, so only
@@ -258,5 +258,55 @@ class Sanity extends ScalaCheckSuite {
         for (pattern <- propertyPatterns) {
             checkWhole(s"$engineName-$pattern-", pattern, engine.compile(pattern))
         }
+
+        // KMY/JiTrex: bytecode compiler NPE on [^aeiou]*
+        if (!Set("KMY", "JiTrex").contains(engineName)) {
+            test(s"$engineName-alphavowels-dictionary-words") {
+                val rx = engine.compile(Constants.ALPHAVOWELS)
+                assert(rx.hasWholeMatch("facetious"))
+                assert(rx.hasWholeMatch("abstemious"))
+                assert(rx.hasWholeMatch("facetiously"))
+                assert(!rx.hasWholeMatch("hello"))
+                assert(!rx.hasWholeMatch("queue"))
+                assert(!rx.hasWholeMatch("sequential"))
+                assert(!rx.hasWholeMatch("A"))
+                assert(rx.locateFirstMatchIn("facetious").isDefined)
+                assert(rx.locateFirstMatchIn("hello").isEmpty)
+            }
+        }
+
+        // MacroNeedle: bake list only.  KMY: hasWholeMatch treats [0-9]{4} as
+        // a whole match (anchored search is broken on this pattern).
+        if (!Set("MacroNeedle", "KMY").contains(engineName)) {
+            test(s"$engineName-accesslog-sample-lines") {
+                val rx = engine.compile(Constants.ACCESSLOG)
+                assert(rx.hasWholeMatch(Constants.ACCESSLOG_SAMPLE_HIT))
+                assert(!rx.hasWholeMatch(Constants.ACCESSLOG_SAMPLE_MISS))
+            }
+        }
+    }
+
+    test("DICT_LINES repeats the dictionary to the target length") {
+        val lines = Constants.DICT_LINES(10)
+        val chars = lines.iterator.map(_.length).sum
+        assert(chars >= (1 << 10))
+        assert(chars < (1 << 10) + 24)
+        assert(lines.nonEmpty)
+        assert(lines.forall(_.nonEmpty))
+    }
+
+    test("ACCESSLOG_LINES are ~120-char Hit/Miss corpora") {
+        val hit = Constants.ACCESSLOG_SAMPLE_HIT
+        val miss = Constants.ACCESSLOG_SAMPLE_MISS
+        assert(hit.length >= 100 && hit.length <= 140, s"hit length ${hit.length}: $hit")
+        assert(miss.endsWith(" -"), s"miss should fail at trailing IP, got: $miss")
+        val lines = Constants.ACCESSLOG_LINES_HIT(10)
+        val chars = lines.iterator.map(_.length).sum
+        assert(chars >= (1 << 10))
+        assert(chars < (1 << 10) + 140)
+        assert(lines.nonEmpty)
+        val javaRx = JavaUtil.compile(Constants.ACCESSLOG)
+        assert(lines.forall(javaRx.hasWholeMatch))
+        assert(Constants.ACCESSLOG_LINES_MISS(8).forall(l => !javaRx.hasWholeMatch(l)))
     }
 }

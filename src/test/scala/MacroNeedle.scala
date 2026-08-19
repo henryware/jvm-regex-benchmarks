@@ -48,7 +48,10 @@ object MacroNeedle extends RegexEngine {
         "[A-Z][a-z]{1,11}"                -> MNeedle.compile("[A-Z][a-z]{1,11}"),
         ".{1,12}"                          -> MNeedle.compile(".{1,12}"),
         "\\d{3}-\\d{3}-\\d{4}"            -> MNeedle.compile("[0-9]{3}-[0-9]{3}-[0-9]{4}"),
-        "(?:c*ac*ac*b)*(?:c*ac*ac*ac*b)"  -> MNeedle.compile("(c*ac*ac*b)*(c*ac*ac*ac*b)")
+        "(?:c*ac*ac*b)*(?:c*ac*ac*ac*b)"  -> MNeedle.compile("(?:c*ac*ac*b)*(?:c*ac*ac*ac*b)"),
+        // alphavowels (Kernighan & Pike)
+        "[^aeiou]*a[^aeiou]*e[^aeiou]*i[^aeiou]*o[^aeiou]*u[^aeiou]*" ->
+            MNeedle.compile("[^aeiou]*a[^aeiou]*e[^aeiou]*i[^aeiou]*o[^aeiou]*u[^aeiou]*")
     )
 
     def compile(pattern: String): Regex = {

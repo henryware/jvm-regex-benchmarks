@@ -27,12 +27,14 @@ class MacroNeedleSpec extends munit.FunSuite {
             assertEquals(mm.matches(), rm.matches(), s"matches() differs for $label on '$txt'")
             assertEquals(mm.containedIn(), rp.matcher(txt).containedIn(),
                 s"containedIn() differs for $label on '$txt'")
-            val rFind = rp.matcher(txt).find()
-            val mFind = mp.matcher(txt).find()
-            assertEquals(mFind.matched, rFind.matched, s"find().matched differs for $label on '$txt'")
-            if (rFind.matched) {
-                assertEquals(mFind.start, rFind.start, s"find().start differs for $label on '$txt'")
-                assertEquals(mFind.`end`, rFind.`end`, s"find().end differs for $label on '$txt'")
+            val rmFind = rp.matcher(txt)
+            val mmFind = mp.matcher(txt)
+            val rFound = rmFind.find()
+            val mFound = mmFind.find()
+            assertEquals(mFound, rFound, s"find() differs for $label on '$txt'")
+            if (rFound) {
+                assertEquals(mmFind.start(), rmFind.start(), s"find().start differs for $label on '$txt'")
+                assertEquals(mmFind.end(), rmFind.end(), s"find().end differs for $label on '$txt'")
             }
         }
     }
@@ -121,7 +123,7 @@ class MacroNeedleSpec extends munit.FunSuite {
 
     test("NeedleRuntime.materialize joins multiple chunks") {
         val cls = "MacroNeedleSpec$ManualChunk$"
-        val bytes = DFACompiler.compileToBytes("xy", cls)
+        val bytes = DFACompiler.compileToBytes("xy", cls, 0)
         val b64 = Base64.getEncoder.encodeToString(bytes)
         val third = math.max(1, b64.length / 3)
         val c1 = b64.substring(0, third)

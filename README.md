@@ -160,6 +160,12 @@ Does the regular expression match the whole input?
 
 - [**WholeMatch DotStar Ascii**](https://henryware.github.io/jvm-regex-benchmarks/WholeMatch_DotStar_Ascii.html) `/.*/` vs `<random string of ascii printables>`.
 
+- [**WholeMatch Alphavowels Dict**](https://henryware.github.io/jvm-regex-benchmarks/WholeMatch_Alphavowels_Dict.html) `/[^aeiou]*a[^aeiou]*e[^aeiou]*i[^aeiou]*o[^aeiou]*u[^aeiou]*/` vs dictionary words, one whole-line match at a time.  Kernighan & Pike's classic "vowels in order" grep (`^...$` on `/usr/dict/words`); the dictionary is repeated to fill the target length.  KMY and JiTrex skip this pattern (their bytecode compilers NPE on `[^aeiou]*`).
+
+- [**WholeMatch Accesslog Hit**](https://henryware.github.io/jvm-regex-benchmarks/WholeMatch_Accesslog_Hit.html) ISO-8601 timestamp + level + service + method + path + status + duration + IPv4 vs synthetic ~120-character access-log lines, one whole-line match at a time.
+
+- [**WholeMatch Accesslog Miss**](https://henryware.github.io/jvm-regex-benchmarks/WholeMatch_Accesslog_Miss.html) same pattern vs the same lines with the IPv4 field replaced by `-`, so the match fails at the end of the line.  KMY skips this pair (its whole-match is wrong on the pattern).
+
 ### Partial Match
 
 Does the regular expression match a substring of the input?
@@ -188,6 +194,8 @@ Does the regular expression match a subset of the string?  What is the location 
 
 - [**Locate Company Cjk Miss**](https://henryware.github.io/jvm-regex-benchmarks/Locate_Company_Cjk_Miss.html)  `/[一-鿿]{2,8}(?:株式会社|有限公司|股份有限公司)(?:第[0-9一-鿿]{1,3}号)?/` vs `⟨random CJK Unified Ideographs⟩`
 
+- [**Locate Alphavowels Dict**](https://henryware.github.io/jvm-regex-benchmarks/Locate_Alphavowels_Dict.html) `/[^aeiou]*a[^aeiou]*e[^aeiou]*i[^aeiou]*o[^aeiou]*u[^aeiou]*/` vs dictionary words, `locateFirstMatchIn` on each line.  Same corpus as WholeMatch Alphavowels Dict.
+
 ### Locate All
 
 Does the regular expression match a subset of the string?  What are the locations of the such matches? 
@@ -208,7 +216,7 @@ Does the regular expression match a subset of the string?  What are the location
 
 #### Line test
 
-A common regex uses case is work on lines of text of, say, 120 characters.   None of these benchmarks are exactly like that.  We do, however, test against single lines of 64 and 128 chars.
+Covered by the alphavowels dictionary benches (short words) and the access-log Hit/Miss pair (~120-character structured lines).
 
 #### DFA Torture test
 For DFAs, compiling `/a(a|b){N}x/` is exponential in space.  Not currently tested or benchmarked.

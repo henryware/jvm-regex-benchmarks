@@ -103,12 +103,92 @@ package worldofregex {
         val PARSE_PHONE_NUM="""\(?(\d{3})\)?\s?-\s{0,2}(\d{3})-(\d{4})""";
 
 
+        lazy val dictionary={
+            scala.io.Source.fromResource("words.txt").getLines.toArray
+        }
+
         lazy val words={
-            scala.io.Source.fromResource("words.txt").
-                getLines.
-                filter(_.size==9).
-                toList |>
+            dictionary.filter(_.size==9).toList |>
                 scala.util.Random.shuffle
+        }
+
+        // Kernighan & Pike, The Practice of Programming: words whose
+        // vowels are exactly a,e,i,o,u in that order.  Original is
+        // ^...$; anchors omitted so DFA engines that reject them still
+        // run.  hasWholeMatch supplies the same whole-line semantics.
+        val ALPHAVOWELS="""[^aeiou]*a[^aeiou]*e[^aeiou]*i[^aeiou]*o[^aeiou]*u[^aeiou]*"""
+
+        private def repeatToLength(i:Int, lineAt:Int=>String):Array[String]={
+            val target= 1<<(i)
+            val buf= Array.newBuilder[String]
+            var n=0
+            var k=0
+            while (n < target) {
+                val line= lineAt(k)
+                buf += line
+                n += line.length
+                k += 1
+            }
+            buf.result()
+        }
+
+        val DICT_LINES= Util.Memoize{ (i:Int) =>
+            val src= dictionary
+            val len= src.length
+            repeatToLength(i, k => src(k % len))
+        }
+
+        // Synthetic ~120-char access-log line.  Anchors omitted; hasWholeMatch
+        // is the whole-line check.  Hyphen is first in classes so Monq/Needle
+        // do not treat "_-" as a range.  No [^class]* so JiTrex can compile it.
+        val ACCESSLOG="""[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[.][0-9]{3}Z (INFO|WARN|ERROR) [-A-Za-z0-9_]+ [A-Z]+ /[-A-Za-z0-9/_]+ [0-9]{3} [0-9]+ms [0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}"""
+
+        private val accessLogTargetLen=120
+        private val accessLogLevels=Array("INFO","WARN","ERROR")
+        private val accessLogServices=Array("api-gateway","worker-12","auth","inventory","checkout")
+        private val accessLogMethods=Array("GET","POST","PUT","DELETE","HEAD")
+        private val accessLogStatuses=Array("200","201","204","301","400","404","500")
+
+        private lazy val pathWords=
+            dictionary.filter(w => w.nonEmpty && w.forall(c => c.isLetterOrDigit || c=='_' || c=='-'))
+
+        private def dottedIpv4(i:Int)=
+            s"${(i*13)&0xff}.${(i*7+1)&0xff}.${(i*3+5)&0xff}.${(i*11+9)&0xff}"
+
+        private def accessLogLine(i:Int, ip:String):String={
+            val ts=f"2026-${(i%12)+1}%02d-${(i%28)+1}%02dT${i%24}%02d:${i%60}%02d:${(i*7)%60}%02d.${(i*13)%1000}%03dZ"
+            val level=accessLogLevels(i % accessLogLevels.length)
+            val service=accessLogServices(i % accessLogServices.length)
+            val method=accessLogMethods(i % accessLogMethods.length)
+            val status=accessLogStatuses(i % accessLogStatuses.length)
+            val dur=s"${i%500}ms"
+            val prefix=s"$ts $level $service $method "
+            val suffix=s" $status $dur $ip"
+            val pathBudget=math.max(2, accessLogTargetLen - prefix.length - suffix.length)
+            val pw=pathWords
+            val path=new StringBuilder(pathBudget+16)
+            path+='/'
+            var k=i
+            while (path.length < pathBudget) {
+                if (path.length > 1) path+='/'
+                path++=pw(k % pw.length)
+                k += 1
+            }
+            if (path.length > pathBudget) path.setLength(pathBudget)
+            if (path.last=='/') path.setLength(path.length-1)
+            if (path.length < 2) path++="x"
+            prefix + path.toString + suffix
+        }
+
+        lazy val ACCESSLOG_SAMPLE_HIT= accessLogLine(42, "203.0.113.88")
+        lazy val ACCESSLOG_SAMPLE_MISS= accessLogLine(42, "-")
+
+        val ACCESSLOG_LINES_HIT= Util.Memoize{ (i:Int) =>
+            repeatToLength(i, k => accessLogLine(k, dottedIpv4(k)))
+        }
+
+        val ACCESSLOG_LINES_MISS= Util.Memoize{ (i:Int) =>
+            repeatToLength(i, k => accessLogLine(k, "-"))
         }
 
         val JUMBOpattern= Util.Memoize{ (i:Int) =>

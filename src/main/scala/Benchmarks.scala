@@ -33,6 +33,13 @@ package RBench {
         var abcEnd:Regex = uninitialized
         var star:Regex = uninitialized
         var cjkComplex:Regex = uninitialized
+        var alphavowels:Regex = uninitialized
+        var dictLines:Array[String] = uninitialized
+        var alphavowelsUnavailable:Boolean = false
+        var accesslog:Regex = uninitialized
+        var accesslogHit:Array[String] = uninitialized
+        var accesslogMiss:Array[String] = uninitialized
+        var accesslogUnavailable:Boolean = false
 
         //@Param(Array("8","12","16"))
         @Param(Array("5","6","7","8","9","10","11","12","13","14","15","16", "17","18","19","20","21","22"))
@@ -46,6 +53,8 @@ package RBench {
 
         @Setup
         def prepare():Unit={
+            alphavowelsUnavailable=false
+            accesslogUnavailable=false
             try {
                 val engineClass=Class.forName("worldofregex."+factoryName+"$");
                 engine=engineClass.getField("MODULE$").get(null).asInstanceOf[RegexEngine]
@@ -63,8 +72,37 @@ package RBench {
             ax=engine.compile(AXpat)
             abcEnd=engine.compile(ABCpat)
             cjkComplex=engine.compile(CJK_LOCATE_PAT)
+            // KMY/JiTrex NPE on [^aeiou]* (bytecode compiler bug)
+            try {
+                alphavowels=engine.compile(ALPHAVOWELS)
+            } catch {
+                case _: Throwable =>
+                    alphavowelsUnavailable=true
+            }
+            dictLines=DICT_LINES(index)
+            // KMY's anchored whole-match reports [0-9]{4} as a full match
+            if (factoryName == "KMY") {
+                accesslogUnavailable=true
+            } else try {
+                accesslog=engine.compile(ACCESSLOG)
+            } catch {
+                case _: Throwable =>
+                    accesslogUnavailable=true
+            }
+            accesslogHit=ACCESSLOG_LINES_HIT(index)
+            accesslogMiss=ACCESSLOG_LINES_MISS(index)
 
 
+        }
+
+        private def countWholeMatches(rx:Regex, lines:Array[String]):Int={
+            var hits=0
+            var i=0
+            while (i < lines.length) {
+                if (rx.hasWholeMatch(lines(i))) hits += 1
+                i += 1
+            }
+            hits
         }
 
         // Engines whose Compile_Jumbo is especially slow
@@ -177,6 +215,40 @@ package RBench {
             } else {
                 0
             }
+        }
+
+        @Benchmark
+        def WholeMatch_Alphavowels_Dict()= {
+            if (unavailable || alphavowelsUnavailable) throw new RegexException("engine unavailable");
+            else countWholeMatches(alphavowels, dictLines)
+        }
+
+        @Benchmark
+        def Locate_Alphavowels_Dict()= {
+            if (unavailable || alphavowelsUnavailable) throw new RegexException("engine unavailable");
+            else {
+                var hits=0
+                var i=0
+                val lines=dictLines
+                val rx=alphavowels
+                while (i < lines.length) {
+                    if (rx.locateFirstMatchIn(lines(i)).isDefined) hits += 1
+                    i += 1
+                }
+                hits
+            }
+        }
+
+        @Benchmark
+        def WholeMatch_Accesslog_Hit()= {
+            if (unavailable || accesslogUnavailable) throw new RegexException("engine unavailable");
+            else countWholeMatches(accesslog, accesslogHit)
+        }
+
+        @Benchmark
+        def WholeMatch_Accesslog_Miss()= {
+            if (unavailable || accesslogUnavailable) throw new RegexException("engine unavailable");
+            else countWholeMatches(accesslog, accesslogMiss)
         }
 
     }

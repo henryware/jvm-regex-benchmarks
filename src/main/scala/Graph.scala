@@ -110,6 +110,10 @@ package worldofregex {
 
             val benchDescriptions: Map[String, (String, String)] = Map(
                 "WholeMatch_DotStar_Ascii" -> ("/.*/ vs ⟨random ascii printable string⟩", "higher is better"),
+                "WholeMatch_Alphavowels_Dict" -> ("""/[^aeiou]*a[^aeiou]*e[^aeiou]*i[^aeiou]*o[^aeiou]*u[^aeiou]*/ vs ⟨dictionary words, one per line⟩""", "higher is better"),
+                "Locate_Alphavowels_Dict"     -> ("""/[^aeiou]*a[^aeiou]*e[^aeiou]*i[^aeiou]*o[^aeiou]*u[^aeiou]*/ vs ⟨dictionary words, one per line⟩""", "higher is better"),
+                "WholeMatch_Accesslog_Hit"    -> ("""/[0-9]{4}-[0-9]{2}-[0-9]{2}T…Z (INFO|WARN|ERROR) … [0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/ vs ⟨~120-char access-log lines⟩""", "higher is better"),
+                "WholeMatch_Accesslog_Miss"   -> ("""/[0-9]{4}-[0-9]{2}-[0-9]{2}T…Z (INFO|WARN|ERROR) … [0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/ vs ⟨same lines, IP replaced by -⟩""", "higher is better"),
                 "Match_Phone_Ascii_Hit"    -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random ascii printable string⟩⟨phoneNumber⟩""", "higher is better"),
                 "Match_Phone_Ascii_Miss"   -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨ascii printable string⟩""", "higher is better"),
                 "Match_Phone_Cjk_Hit"      -> ("""/(?:\d{3}\s?-\s?|\(?:\d{3}\)\s{0,2})(?:\d{3}-\d{4})/ vs ⟨random CJK Unified Ideographs⟩⟨phoneNumber⟩""", "higher is better"),

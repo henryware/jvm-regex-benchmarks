@@ -1,5 +1,5 @@
 //>using jvm 25
-//>using scala 3.8.1
+//>using scala 3.8.4
 
 
 // turn off scary warnings reguarding lazy vals
@@ -66,21 +66,13 @@
 //> using dep net.amygdalum:patternsearchalgorithms:1.5.0 
 
 // ====
-// Needle 0.0.1 release May 2024
+// Needle 0.0.2 release May 2026
 // https://github.com/hyperpape/needle
 // MIT
-// Parent POM `com.justinblank:needle:0.0.1` was never published to Maven
-// Central, so `//> using dep com.justinblank:needle-compiler:0.0.1` fails to
-// resolve.  Workaround: take the jars directly and pull the transitives by
-// explicit dep.
+// Transitives (mako 0.0.6, commons-lang3 3.18.0, byte-buddy 1.12.19) come
+// from needle-compiler's POM.
 
-//> using jar lib/needle-compiler-0.0.1.jar
-//> using jar lib/needle-types-0.0.1.jar
-// Versions below are pinned to what Needle 0.0.1 requires; do not upgrade
-// (newer versions are incompatible). Outdated-dep hints from scala-cli are expected.
-//> using dep com.justinblank:mako:0.0.4
-//> using dep org.apache.commons:commons-lang3:3.8
-//> using dep net.bytebuddy:byte-buddy:1.10.20
+//> using dep com.justinblank:needle-compiler:0.0.2
 
 // ====
 // Lucerne 10.1.0 release Dec 2024

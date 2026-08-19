@@ -2,22 +2,21 @@ package worldofregex;
 
 /** Adapter for Needle (https://github.com/hyperpape/needle)
   *
-  * DFA-based regex compiler that emits a fresh JVM class per pattern.  The
-  * 0.0.1 release of needle-compiler is much barer than the project README
-  * (which describes the in-development interface): no flags, no anchors, no
-  * non-capturing groups.  Capabilities observed at runtime against 0.0.1:
-  *  - basic regex syntax, character classes (\d, \s, \w), groups (no
-  *    submatch extraction).
-  *  - default match semantics are leftmost-first (Perl-style).
-  *  - '.' matches '\n' by default (no DOTALL flag in 0.0.1).
-  *  - anchors ^/$ raise RegexSyntaxException.
-  *  - non-capturing '(?:...)' raises RegexSyntaxException; mangled to '(...)'.
-  *  - find() does not advance past zero-width matches; locateAllMatchIn drives
-  *    iteration via the bounded find(start, end) overload.
+  * DFA-based regex compiler that emits a fresh JVM class per pattern.
+  * Capabilities observed at runtime against 0.0.2:
+  *  - basic regex syntax, character classes (\d, \s, \w), capturing and
+  *    non-capturing groups (no submatch extraction).
+  *  - flags: DOTALL, CASE_INSENSITIVE, UNICODE_CASE, UNICODE_CHARACTER_CLASS,
+  *    LEFTMOST_LONGEST.  We compile with the defaults (leftmost-first,
+  *    '.' does not match '\n').
+  *  - anchors ^/$ still raise RegexSyntaxException.
+  *  - find() returns boolean; start/end live on the Matcher.  The unbounded
+  *    find() does not advance past a zero-width match, so locateAllMatchIn
+  *    drives iteration via the bounded find(start, end) overload.
   */
 
 import java.util.concurrent.atomic.AtomicLong
-import com.justinblank.strings.{DFACompiler, Pattern, MatchResult}
+import com.justinblank.strings.{DFACompiler, Pattern}
 import worldofregex.Util.manglePattern
 
 object Needle extends RegexEngine {
@@ -45,7 +44,7 @@ object Needle extends RegexEngine {
      * zero-width iteration logic lives in exactly one place. */
     def regexFromPattern(compiled: Pattern, source: String, engine: String): Regex = {
         /* Probed once so locateAllMatchIn can emit the end-of-string empty
-         * match without calling find(len, len), which throws in 0.0.1. */
+         * match without calling find(len, len). */
         val acceptsEmpty = compiled.matcher("").matches()
 
         new Regex {
@@ -58,15 +57,14 @@ object Needle extends RegexEngine {
             def hasPartialMatch(txt:String):Boolean=compiled.matcher(txt).containedIn()
 
             def locateFirstMatchIn(txt:String):Option[Location]={
-                val r=compiled.matcher(txt).find()
-                if (r.matched) Some(Location(r.start, r.end)) else None
+                val m=compiled.matcher(txt)
+                if (m.find()) Some(Location(m.start(), m.end())) else None
             }
 
             /* Drive iteration via bounded find(start, end) so zero-width
-             * matches don't trap us — the un-bounded find() does not advance
-             * past a (k,k) match.  When we've walked to pos == len we can't
-             * call find (0.0.1 throws on an empty range); emit the trailing
-             * empty match via the pre-probed acceptsEmpty flag.
+             * matches don't trap us — the unbounded find() does not advance
+             * past a (k,k) match.  At pos == len emit the trailing empty
+             * match via the pre-probed acceptsEmpty flag.
              */
             def locateAllMatchIn(txt:String):Iterator[Location]={
                 val m = compiled.matcher(txt)
@@ -75,10 +73,11 @@ object Needle extends RegexEngine {
                 var tailEmitted = false
                 def nextMatch(): Option[Location] = {
                     if (pos < len) {
-                        val r = m.find(pos, len)
-                        if (r.matched){
-                            pos = math.max(r.end, r.start + 1)
-                            Some(Location(r.start, r.end))
+                        if (m.find(pos, len)){
+                            val start=m.start()
+                            val end=m.end()
+                            pos = math.max(end, start + 1)
+                            Some(Location(start, end))
                         } else {
                             pos = len
                             if (acceptsEmpty && !tailEmitted){

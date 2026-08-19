@@ -18,7 +18,7 @@ object NeedleMacro {
         }
         val name = syntheticName(literal)
         val bytes =
-            try DFACompiler.compileToBytes(literal, name)
+            try DFACompiler.compileToBytes(literal, name, 0)
             catch {
                 case t: Throwable =>
                     report.errorAndAbort(s"needle: failed to compile regex `$literal`: ${t.getMessage}")
