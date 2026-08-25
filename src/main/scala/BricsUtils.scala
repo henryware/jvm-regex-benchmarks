@@ -35,7 +35,7 @@ object BricsUtils {
     }
 
     extension (sc: StringContext){
-        def a(args: Any*):Automaton= auto(sc.parts.iterator.next)
+        def a(args: Any*):Automaton= auto(sc.parts.iterator.next())
     }
 
     extension (s:State){

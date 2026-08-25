@@ -104,7 +104,7 @@ package worldofregex {
 
 
         lazy val dictionary={
-            scala.io.Source.fromResource("words.txt").getLines.toArray
+            scala.io.Source.fromResource("words.txt").getLines().toArray
         }
 
         lazy val words={

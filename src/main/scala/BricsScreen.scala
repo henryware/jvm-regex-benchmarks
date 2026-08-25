@@ -207,7 +207,7 @@ object BricsScreen extends RegexEngine {
              * This does always scan the whole string which is not great.
              */ 
             def locateFirstMatchIn(txt:String):Option[Location]={
-                locateAllMatchIn(txt).nextOption
+                locateAllMatchIn(txt).nextOption()
             }
 
             def locateAllMatchIn(txt:String):Iterator[Location]={
@@ -216,7 +216,7 @@ object BricsScreen extends RegexEngine {
 
                 @annotation.tailrec def findOne():Option[Location]={
                     while (!it.isEmpty && it.head < index){
-                        it.next
+                        it.next()
                     }
                     if (it.isEmpty){
                         None
