@@ -15,6 +15,10 @@ trait StandardEngine extends RegexEngine {
     def pmatcher(rx: PatternImpl, txt:String):M
 
     trait M {
+        // Rebind this matcher to new input, reusing the underlying object
+        // instead of allocating a fresh one per call.  Returns self so
+        // callers can write `reset(txt).matches()`.
+        def reset(txt:String):M
         // these match the Java signatures for `export` friendliness.
         def matches():Boolean
         def find():Boolean
@@ -38,9 +42,16 @@ trait StandardEngine extends RegexEngine {
             }
         }
 
-        def hasWholeMatch(txt:String):Boolean=pmatcher(rx,txt).matches()
+        // One reusable matcher per thread.  The compiled Regex is shared
+        // (JMH @State(Scope.Benchmark)) and java-style Matchers are not
+        // thread-safe, so we keep the state thread-local rather than a bare
+        // field.  This lets hasWholeMatch et al. reset() instead of paying a
+        // fresh Matcher allocation on every call.
+        private val tlm= ThreadLocal.withInitial[M](() => pmatcher(rx,""))
 
-        def hasPartialMatch(txt:String):Boolean=pmatcher(rx,txt).find()
+        def hasWholeMatch(txt:String):Boolean=tlm.get().reset(txt).matches()
+
+        def hasPartialMatch(txt:String):Boolean=tlm.get().reset(txt).find()
 
         inline private def submatches(m:M)={
             if (m.groupCount()==0) {
@@ -58,10 +69,12 @@ trait StandardEngine extends RegexEngine {
         }
 
         def locateFirstMatchIn(txt:String):Option[Location]={
-            findMatch(pmatcher(rx,txt))
+            findMatch(tlm.get().reset(txt))
         }
 
         def locateAllMatchIn(txt:String):Iterator[Location]={
+            // Fresh matcher: the returned iterator retains it lazily, so it
+            // must not share the thread-local that the other methods reset.
             val m=pmatcher(rx,txt)
             Iterator.continually(findMatch(m)).takeWhile(_.isDefined).flatten
         }
