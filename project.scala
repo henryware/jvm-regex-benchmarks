@@ -1,15 +1,15 @@
-//>using jvm 25
-//>using scala 3.8.4
+//> using jvm 25
+//> using scala 3.8.4
 
 
 // turn off scary warnings reguarding lazy vals
-//>using javaOpt --sun-misc-unsafe-memory-access=allow
+//> using javaOpt --sun-misc-unsafe-memory-access=allow
 
 // Panama FFI for native regex engines (PCRE2, Hyperscan, RE2)
-//>using javaOpt --enable-native-access=ALL-UNNAMED
+//> using javaOpt --enable-native-access=ALL-UNNAMED
 
 // this is literally a dictionary.
-//>using jar lib/dictionary.jar
+//> using jar lib/dictionary.jar
 
 // ====
 //  Brics Automaton Jan 2022
@@ -110,7 +110,7 @@
 
 // lets use what the dependencies dragged in //> using dep org.scalacheck::scalacheck:1.19.0
 
-//> using test.dep org.scalameta::munit::1.3.0
+//> using test.dep org.scalameta::munit::1.3.5
 //> using test.dep org.scalameta::munit-scalacheck::1.3.0
 
 //> using dep io.github.martinhh::scalacheck-derived:0.10.0
