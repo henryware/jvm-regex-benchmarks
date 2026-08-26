@@ -41,24 +41,26 @@ object Amygdalum extends RegexEngine {
 
             val engineName="Amygdalum"
 
-            def hasWholeMatch(txt:String):Boolean=matchPat.matcher(txt).matches()
+            def matcher():Matcher= new Matcher {
+                def hasWholeMatch(txt:String):Boolean=matchPat.matcher(txt).matches()
 
-            def hasPartialMatch(txt:String):Boolean=searchPat.matcher(txt).find()
+                def hasPartialMatch(txt:String):Boolean=searchPat.matcher(txt).find()
 
-            def locateFirstMatchIn(txt:String):Option[Location]={
-                val m=searchPat.matcher(txt)
-                if (m.find()) Some(Location(m.start().toInt, m.end().toInt))
-                else None
-            }
+                def locateFirstMatchIn(txt:String):Option[Location]={
+                    val m=searchPat.matcher(txt)
+                    if (m.find()) Some(Location(m.start().toInt, m.end().toInt))
+                    else None
+                }
 
-            /* Since 0.1.4 the library's find() advances past zero-width
-             * matches on its own, so a single matcher drives the iteration.
-             */
-            def locateAllMatchIn(txt:String):Iterator[Location]={
-                val m=searchPat.matcher(txt)
-                Iterator.continually(
-                    if (m.find()) Some(Location(m.start().toInt, m.end().toInt)) else None
-                ).takeWhile(_.isDefined).flatten
+                /* Since 0.1.4 the library's find() advances past zero-width
+                 * matches on its own, so a single matcher drives the iteration.
+                 */
+                def locateAllMatchIn(txt:String):Iterator[Location]={
+                    val m=searchPat.matcher(txt)
+                    Iterator.continually(
+                        if (m.find()) Some(Location(m.start().toInt, m.end().toInt)) else None
+                    ).takeWhile(_.isDefined).flatten
+                }
             }
         }
     }

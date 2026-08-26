@@ -48,31 +48,34 @@ object KMY extends RegexEngine{
 
         val engineName="KMY"
 
-        def hasWholeMatch(txt:String):Boolean= {
-            /* Docs say to use 'matchesWhole', but that fails on 
-             "aa" =~ /a{1}a/
-             "abc" =~ /c$/
-             and others
-             whereas an anchored search just works */
-            are.searchOnce(txt)
-        }
+        def matcher():Matcher= new Matcher {
 
-        def hasPartialMatch(txt:String):Boolean= re.searchOnce(txt)
-
-        def locateFirstMatchIn(txt:String):Option[Location]= {
-            if (re.searchOnce(txt)) {
-                Some(Location(re.getMatchStart,re.getMatchEnd))
-            } else {
-                None
+            def hasWholeMatch(txt:String):Boolean= {
+                /* Docs say to use 'matchesWhole', but that fails on
+                 "aa" =~ /a{1}a/
+                 "abc" =~ /c$/
+                 and others
+                 whereas an anchored search just works */
+                are.searchOnce(txt)
             }
-        }
 
-        def locateAllMatchIn(txt:String):Iterator[Location]= {
+            def hasPartialMatch(txt:String):Boolean= re.searchOnce(txt)
 
-            val arr=txt.toCharArray
-            re.init(arr,0,arr.length)
-            Iterator.continually{if re.search then Some(Location(re.getMatchStart,re.getMatchEnd)) else None}.
-                takeWhile(_.isDefined).flatten
+            def locateFirstMatchIn(txt:String):Option[Location]= {
+                if (re.searchOnce(txt)) {
+                    Some(Location(re.getMatchStart,re.getMatchEnd))
+                } else {
+                    None
+                }
+            }
+
+            def locateAllMatchIn(txt:String):Iterator[Location]= {
+
+                val arr=txt.toCharArray
+                re.init(arr,0,arr.length)
+                Iterator.continually{if re.search then Some(Location(re.getMatchStart,re.getMatchEnd)) else None}.
+                    takeWhile(_.isDefined).flatten
+            }
         }
 
     }

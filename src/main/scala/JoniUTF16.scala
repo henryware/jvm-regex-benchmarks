@@ -32,6 +32,8 @@ object JoniUTF16 extends RegexEngine {
             new JoniRegex(anchored, 0, anchored.length, JoniOption.NONE, UTF16LEEncoding.INSTANCE)
         }
 
+        def matcher(): worldofregex.Matcher = new worldofregex.Matcher {
+
         def hasWholeMatch(txt: String): Boolean = {
             val bytes = txt.getBytes(StandardCharsets.UTF_16LE)
             val matcher = anchoredRegex.matcher(bytes)
@@ -86,6 +88,7 @@ object JoniUTF16 extends RegexEngine {
         def locateAllMatchIn(txt: String): Iterator[Location] = {
             val finder = Finder(txt)
             Iterator.continually(finder.findMatch()).takeWhile(_.isDefined).flatten
+        }
         }
 
         def replaceAllIn(txt: String, replacement: String): String = ???

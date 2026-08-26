@@ -35,7 +35,7 @@ class Sanity extends ScalaCheckSuite {
         tc: TestCase
     )(implicit loc: munit.Location): Unit = {
         test(baseName + "wholeMatch") {
-            val obtained = rx.hasWholeMatch(tc.text).toString
+            val obtained = rx.matcher().hasWholeMatch(tc.text).toString
             assertEquals(
                 obtained,
                 tc.whole,
@@ -43,7 +43,7 @@ class Sanity extends ScalaCheckSuite {
             )
         }
         test(baseName + "partialMatch") {
-            val obtained = rx.hasPartialMatch(tc.text).toString
+            val obtained = rx.matcher().hasPartialMatch(tc.text).toString
             assertEquals(
                 obtained,
                 tc.partial,
@@ -51,7 +51,7 @@ class Sanity extends ScalaCheckSuite {
             )
         }
         test(baseName + "locateFirst") {
-            val obtained = rx.locateFirstMatchIn(tc.text).toString
+            val obtained = rx.matcher().locateFirstMatchIn(tc.text).toString
             assertEquals(
                 obtained,
                 tc.first,
@@ -60,7 +60,7 @@ class Sanity extends ScalaCheckSuite {
             )
         }
         test(baseName + "locateAll") {
-            val obtained = rx.locateAllMatchIn(tc.text).mkString(",")
+            val obtained = rx.matcher().locateAllMatchIn(tc.text).mkString(",")
             assertEquals(
                 obtained,
                 tc.all,
@@ -77,7 +77,7 @@ class Sanity extends ScalaCheckSuite {
         sc: SubmatchCase
     )(implicit loc: munit.Location): Unit = {
         test(name + "submatches") {
-            val obtained = rx.locateAllMatchIn(sc.text).map{
+            val obtained = rx.matcher().locateAllMatchIn(sc.text).map{
                 _.subregions.map{case (s,e) => s"($s,$e)"}.mkString(",")
             }.toList
             assertEquals(
@@ -94,14 +94,14 @@ class Sanity extends ScalaCheckSuite {
         tc: TestCase
     )(implicit loc: munit.Location): Unit = {
         test(baseName + "wholeMatch") {
-            val obtained = rx.hasWholeMatch(tc.text).toString
+            val obtained = rx.matcher().hasWholeMatch(tc.text).toString
             assertEquals(
                 obtained, tc.whole,
                 s"Whole match failed for pattern '${rx}' on text '${tc.text}'"
             )
         }
         test(baseName + "partialMatch") {
-            val obtained = rx.hasPartialMatch(tc.text).toString
+            val obtained = rx.matcher().hasPartialMatch(tc.text).toString
             assertEquals(
                 obtained, tc.partial,
                 s"Partial match failed for pattern '${rx}' on text '${tc.text}'"
@@ -115,7 +115,7 @@ class Sanity extends ScalaCheckSuite {
         rx:Regex)={
         property(name+"CheckWhole") {
             forAll(RegexpGen.from(pat)){txt =>
-                val obtained = rx.hasWholeMatch(txt);
+                val obtained = rx.matcher().hasWholeMatch(txt);
                 assertEquals(obtained,true)
             }
         }
@@ -262,16 +262,16 @@ class Sanity extends ScalaCheckSuite {
         // KMY/JiTrex: bytecode compiler NPE on [^aeiou]*
         if (!Set("KMY", "JiTrex").contains(engineName)) {
             test(s"$engineName-alphavowels-dictionary-words") {
-                val rx = engine.compile(Constants.ALPHAVOWELS)
-                assert(rx.hasWholeMatch("facetious"))
-                assert(rx.hasWholeMatch("abstemious"))
-                assert(rx.hasWholeMatch("facetiously"))
-                assert(!rx.hasWholeMatch("hello"))
-                assert(!rx.hasWholeMatch("queue"))
-                assert(!rx.hasWholeMatch("sequential"))
-                assert(!rx.hasWholeMatch("A"))
-                assert(rx.locateFirstMatchIn("facetious").isDefined)
-                assert(rx.locateFirstMatchIn("hello").isEmpty)
+                val m = engine.compile(Constants.ALPHAVOWELS).matcher()
+                assert(m.hasWholeMatch("facetious"))
+                assert(m.hasWholeMatch("abstemious"))
+                assert(m.hasWholeMatch("facetiously"))
+                assert(!m.hasWholeMatch("hello"))
+                assert(!m.hasWholeMatch("queue"))
+                assert(!m.hasWholeMatch("sequential"))
+                assert(!m.hasWholeMatch("A"))
+                assert(m.locateFirstMatchIn("facetious").isDefined)
+                assert(m.locateFirstMatchIn("hello").isEmpty)
             }
         }
 
@@ -279,9 +279,9 @@ class Sanity extends ScalaCheckSuite {
         // a whole match (anchored search is broken on this pattern).
         if (!Set("MacroNeedle", "KMY").contains(engineName)) {
             test(s"$engineName-accesslog-sample-lines") {
-                val rx = engine.compile(Constants.ACCESSLOG)
-                assert(rx.hasWholeMatch(Constants.ACCESSLOG_SAMPLE_HIT))
-                assert(!rx.hasWholeMatch(Constants.ACCESSLOG_SAMPLE_MISS))
+                val m = engine.compile(Constants.ACCESSLOG).matcher()
+                assert(m.hasWholeMatch(Constants.ACCESSLOG_SAMPLE_HIT))
+                assert(!m.hasWholeMatch(Constants.ACCESSLOG_SAMPLE_MISS))
             }
         }
     }
@@ -305,8 +305,8 @@ class Sanity extends ScalaCheckSuite {
         assert(chars >= (1 << 10))
         assert(chars < (1 << 10) + 140)
         assert(lines.nonEmpty)
-        val javaRx = JavaUtil.compile(Constants.ACCESSLOG)
-        assert(lines.forall(javaRx.hasWholeMatch))
-        assert(Constants.ACCESSLOG_LINES_MISS(8).forall(l => !javaRx.hasWholeMatch(l)))
+        val javaM = JavaUtil.compile(Constants.ACCESSLOG).matcher()
+        assert(lines.forall(javaM.hasWholeMatch))
+        assert(Constants.ACCESSLOG_LINES_MISS(8).forall(l => !javaM.hasWholeMatch(l)))
     }
 }

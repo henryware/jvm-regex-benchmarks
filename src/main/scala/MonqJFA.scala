@@ -20,50 +20,53 @@ object MonqJFA extends RegexEngine {
 
             val engineName="MonqJFA"
 
-            def hasWholeMatch(txt:String):Boolean=rx.matches(txt,0)
+            def matcher():Matcher= new Matcher {
 
-            def hasPartialMatch(txt:String):Boolean=
-                if (startPin && endPin){
-                    hasWholeMatch(txt);
-                } else {
-                    findMatchIn(txt,0).isDefined
-                }
-        
-            def findMatchIn(txt:String, index:Int):Option[Location]={
-                if (index>txt.length) {
-                    None
-                } else {
-                    rx.find(txt,index) match {
-                        case -1 => None
-                        case i => {
-                            val stop=i+rx.length;
-                            if ((startPin && i>0) ||
-                                    (endPin && stop<txt.length)) {
-                                None
-                            } else {
-                                Some(Location(i,stop));
+                def hasWholeMatch(txt:String):Boolean=rx.matches(txt,0)
+
+                def hasPartialMatch(txt:String):Boolean=
+                    if (startPin && endPin){
+                        hasWholeMatch(txt);
+                    } else {
+                        findMatchIn(txt,0).isDefined
+                    }
+
+                def findMatchIn(txt:String, index:Int):Option[Location]={
+                    if (index>txt.length) {
+                        None
+                    } else {
+                        rx.find(txt,index) match {
+                            case -1 => None
+                            case i => {
+                                val stop=i+rx.length;
+                                if ((startPin && i>0) ||
+                                        (endPin && stop<txt.length)) {
+                                    None
+                                } else {
+                                    Some(Location(i,stop));
+                                }
                             }
                         }
                     }
                 }
-            }
 
 
-            def locateFirstMatchIn(txt:String):Option[Location]={
-                findMatchIn(txt,0)
-            }
-            
-            def locateAllMatchIn(txt:String):Iterator[Location]={
-                var index=0;
-                def next={
-                    val ret=findMatchIn(txt,index)
-                    ret.foreach{r => index= if(index==r.end) index +1 else r.end}
-                    ret
+                def locateFirstMatchIn(txt:String):Option[Location]={
+                    findMatchIn(txt,0)
                 }
-                Iterator.continually(next).takeWhile(_ !=None).flatten
-            }
 
-            def replaceAllIn(txt: String, replacement: String): String=  ???
+                def locateAllMatchIn(txt:String):Iterator[Location]={
+                    var index=0;
+                    def next={
+                        val ret=findMatchIn(txt,index)
+                        ret.foreach{r => index= if(index==r.end) index +1 else r.end}
+                        ret
+                    }
+                    Iterator.continually(next).takeWhile(_ !=None).flatten
+                }
+
+                def replaceAllIn(txt: String, replacement: String): String=  ???
+            }
         }
     }
 }

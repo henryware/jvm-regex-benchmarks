@@ -96,10 +96,11 @@ package RBench {
         }
 
         private def countWholeMatches(rx:Regex, lines:Array[String]):Int={
+            val m=rx.matcher()
             var hits=0
             var i=0
             while (i < lines.length) {
-                if (rx.hasWholeMatch(lines(i))) hits += 1
+                if (m.hasWholeMatch(lines(i))) hits += 1
                 i += 1
             }
             hits
@@ -119,7 +120,7 @@ package RBench {
         @Benchmark
         def WholeMatch_DotStar_Ascii()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (star.hasWholeMatch(LONG_TEXT_PN(index))){
+            else if (star.matcher().hasWholeMatch(LONG_TEXT_PN(index))){
                     1
             } else {
                 0
@@ -130,7 +131,7 @@ package RBench {
         @Benchmark
         def Match_Phone_Ascii_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (phoneNumber.hasPartialMatch(LONG_TEXT_PN(index))){
+            else if (phoneNumber.matcher().hasPartialMatch(LONG_TEXT_PN(index))){
                     1
             } else {
                 0
@@ -140,7 +141,7 @@ package RBench {
         @Benchmark
         def Match_Phone_Ascii_Miss()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (phoneNumber.hasPartialMatch(LONG_TEXT(index))){
+            else if (phoneNumber.matcher().hasPartialMatch(LONG_TEXT(index))){
                     1
             } else {
                 0
@@ -150,7 +151,7 @@ package RBench {
         @Benchmark
         def Locate_Phone_Ascii_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (phoneNumber.locateFirstMatchIn(LONG_TEXT_PN(index)).isEmpty){
+            else if (phoneNumber.matcher().locateFirstMatchIn(LONG_TEXT_PN(index)).isEmpty){
                     1
             } else {
                 0
@@ -160,7 +161,7 @@ package RBench {
         @Benchmark
         def Locate_Phone_Ascii_Miss()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (phoneNumber.locateFirstMatchIn(LONG_TEXT(index)).isEmpty){
+            else if (phoneNumber.matcher().locateFirstMatchIn(LONG_TEXT(index)).isEmpty){
                     1
             } else {
                 0
@@ -170,7 +171,7 @@ package RBench {
         @Benchmark
         def Match_Abc_Ascii_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (abcEnd.hasPartialMatch(LONG_TEXT_ABC(index))){
+            else if (abcEnd.matcher().hasPartialMatch(LONG_TEXT_ABC(index))){
                 1
             } else {
                 0
@@ -180,7 +181,7 @@ package RBench {
         @Benchmark
         def Match_Phone_Cjk_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (phoneNumber.hasPartialMatch(LONG_UNICODE_TEXT_PN(index))){
+            else if (phoneNumber.matcher().hasPartialMatch(LONG_UNICODE_TEXT_PN(index))){
                 1
             } else {
                 0
@@ -190,7 +191,7 @@ package RBench {
         @Benchmark
         def Match_Phone_Cjk_Miss()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (phoneNumber.hasPartialMatch(LONG_UNICODE_TEXT(index))){
+            else if (phoneNumber.matcher().hasPartialMatch(LONG_UNICODE_TEXT(index))){
                 1
             } else {
                 0
@@ -200,7 +201,7 @@ package RBench {
         @Benchmark
         def Locate_Company_Cjk_Hit()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (cjkComplex.locateFirstMatchIn(LONG_UNICODE_TEXT_CJK(index)).isEmpty){
+            else if (cjkComplex.matcher().locateFirstMatchIn(LONG_UNICODE_TEXT_CJK(index)).isEmpty){
                 1
             } else {
                 0
@@ -210,7 +211,7 @@ package RBench {
         @Benchmark
         def Locate_Company_Cjk_Miss()= {
             if (unavailable) throw new RegexException("engine unavailable");
-            else if (cjkComplex.locateFirstMatchIn(LONG_UNICODE_TEXT(index)).isEmpty){
+            else if (cjkComplex.matcher().locateFirstMatchIn(LONG_UNICODE_TEXT(index)).isEmpty){
                 1
             } else {
                 0
@@ -230,9 +231,9 @@ package RBench {
                 var hits=0
                 var i=0
                 val lines=dictLines
-                val rx=alphavowels
+                val m=alphavowels.matcher()
                 while (i < lines.length) {
-                    if (rx.locateFirstMatchIn(lines(i)).isDefined) hits += 1
+                    if (m.locateFirstMatchIn(lines(i)).isDefined) hits += 1
                     i += 1
                 }
                 hits
@@ -304,7 +305,7 @@ package RBench {
                 -1  // too slow to run
             } else {
                 var sum=0;
-                for (r <- ax.locateAllMatchIn(AB(index))) do {
+                for (r <- ax.matcher().locateAllMatchIn(AB(index))) do {
                     sum += r.start;
                 }
                 sum
@@ -358,7 +359,7 @@ package RBench {
             if (unavailable) -1
             else if (index>=20) {
                 -1  // too slow to run
-            } else if (aaa.locateFirstMatchIn(AAA(index)).isEmpty){
+            } else if (aaa.matcher().locateFirstMatchIn(AAA(index)).isEmpty){
                 1
             } else {
                 0

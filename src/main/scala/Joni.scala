@@ -27,11 +27,13 @@ object Joni extends RegexEngine {
             new JoniRegex(anchoredPattern,0,anchoredPattern.length,JoniOption.NONE, UTF8Encoding.INSTANCE)
         }
 
+        def matcher():Matcher = new worldofregex.Matcher {
+
         /** Checks if the entire string matches the pattern */
         def hasWholeMatch(txt: String): Boolean = {
             val bytes = txt.getBytes("UTF-8")
             val matcher = anchoredRegex.matcher(bytes)
-            
+
             bytes.length == matcher.`match`(0, bytes.length, JoniOption.FIND_LONGEST)
         }
 
@@ -122,6 +124,8 @@ object Joni extends RegexEngine {
         def locateAllMatchIn(txt: String): Iterator[Location] = {
             val finder=Finder(txt)
             Iterator.continually(finder.findMatch()).takeWhile(_.isDefined).flatten
+        }
+
         }
 
         def replaceAllIn(txt: String, replacement: String): String= ???

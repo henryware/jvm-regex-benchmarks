@@ -131,6 +131,8 @@ object Pcre2FFI extends RegexEngine {
             override def toString = s"Pcre2FFI($pattern)"
             def engineName = "Pcre2FFI"
 
+            def matcher(): Matcher = new Matcher {
+
             def hasWholeMatch(txt: String): Boolean = {
                 val bytes = txt.getBytes("UTF-8")
                 val a = Arena.ofConfined()
@@ -284,6 +286,7 @@ object Pcre2FFI extends RegexEngine {
                         result
                     }
                 }
+            }
             }
         }
     }

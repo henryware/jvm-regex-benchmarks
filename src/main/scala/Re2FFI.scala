@@ -94,6 +94,8 @@ object Re2FFI extends RegexEngine {
             override def toString = s"Re2FFI($pattern)"
             def engineName = "Re2FFI"
 
+            def matcher(): Matcher = new Matcher {
+
             private def doFind(bytes: Array[Byte], startByte: Int, anchor: Int,
                                a: Arena): Option[(IArray[Int], Int)] = {
                 val sub = a.allocate(math.max(bytes.length.toLong, 1L))
@@ -207,6 +209,7 @@ object Re2FFI extends RegexEngine {
                         result
                     }
                 }
+            }
             }
         }
     }

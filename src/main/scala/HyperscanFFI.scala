@@ -148,6 +148,7 @@ object HyperscanFFI extends RegexEngine {
             override def toString = s"HyperscanFFI($pattern)"
             def engineName = "HyperscanFFI"
 
+            def matcher(): Matcher = new Matcher {
             private def doScan(localScratch: MemorySegment, targetDb: MemorySegment,
                                dataSeg: MemorySegment, dataLen: Int, stub: MemorySegment): Unit = {
                 hs_scan_h.invoke(targetDb, dataSeg, dataLen, 0, localScratch, stub, MemorySegment.NULL)
@@ -279,6 +280,7 @@ object HyperscanFFI extends RegexEngine {
                     MethodType.methodType(classOf[Int], classOf[Int], classOf[Long], classOf[Long], classOf[Int], classOf[MemorySegment])
                 )
                 linker.upcallStub(mh, CALLBACK_DESC, a)
+            }
             }
         }
     }

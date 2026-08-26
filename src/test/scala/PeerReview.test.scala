@@ -55,9 +55,9 @@ class PeerReview extends ScalaCheckSuite {
 
     type Aspect=Labeled[(Regex,String)=>String]
 
-    val wholeMatch= new Aspect("wholeMatch", _.hasWholeMatch(_).toString) ;
-    val firstMatch= new Aspect("firstMatch", (r,t)=> r.locateFirstMatchIn(t).toString);
-    val allMatch= new Aspect("All Matches", (r,t) => r.locateAllMatchIn(t).toList.toString);
+    val wholeMatch= new Aspect("wholeMatch", (r,t) => r.matcher().hasWholeMatch(t).toString) ;
+    val firstMatch= new Aspect("firstMatch", (r,t)=> r.matcher().locateFirstMatchIn(t).toString);
+    val allMatch= new Aspect("All Matches", (r,t) => r.matcher().locateAllMatchIn(t).toList.toString);
 
     val aspects=List(wholeMatch,firstMatch,allMatch);
 

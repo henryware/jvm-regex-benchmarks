@@ -34,22 +34,25 @@ object BricsWalk extends RegexEngine {
 
             val engineName="BricsWalk"
 
-            def hasWholeMatch(txt:String):Boolean=a.run(txt)==txt.length
+            def matcher():Matcher= new Matcher {
 
-            def hasPartialMatch(txt:String):Boolean=a.hasPartialMatch(txt);
+                def hasWholeMatch(txt:String):Boolean=a.run(txt)==txt.length
+
+                def hasPartialMatch(txt:String):Boolean=a.hasPartialMatch(txt);
 
 
-            def locateFirstMatchIn(txt:String):Option[Location]={
-                // should this do hasPartialMatch first?   That would help worst case at the
-                // expense of the happy path
-                a.nextMatch(txt,0)
-            }
+                def locateFirstMatchIn(txt:String):Option[Location]={
+                    // should this do hasPartialMatch first?   That would help worst case at the
+                    // expense of the happy path
+                    a.nextMatch(txt,0)
+                }
 
-            def locateAllMatchIn(txt:String):Iterator[Location]={
-                // should this do hasPartialMatch first?   That would help worst case at the
-                // expense of the happy path
-                Iterator.unfold(0){(i) =>
-                    a.nextMatch(txt,i).map{r => (r, math.max(r.end,r.start+1))}
+                def locateAllMatchIn(txt:String):Iterator[Location]={
+                    // should this do hasPartialMatch first?   That would help worst case at the
+                    // expense of the happy path
+                    Iterator.unfold(0){(i) =>
+                        a.nextMatch(txt,i).map{r => (r, math.max(r.end,r.start+1))}
+                    }
                 }
             }
         }

@@ -42,41 +42,40 @@ trait StandardEngine extends RegexEngine {
             }
         }
 
-        // One reusable matcher per thread.  The compiled Regex is shared
-        // (JMH @State(Scope.Benchmark)) and java-style Matchers are not
-        // thread-safe, so we keep the state thread-local rather than a bare
-        // field.  This lets hasWholeMatch et al. reset() instead of paying a
-        // fresh Matcher allocation on every call.
-        private val tlm= ThreadLocal.withInitial[M](() => pmatcher(rx,""))
+        // Each matcher owns one underlying java-style Matcher and reset()s it
+        // per call, so no allocation happens on the hot path.  The Matcher is
+        // not thread-safe (java's contract); callers use one per thread.
+        def matcher():Matcher= new Matcher {
 
-        def hasWholeMatch(txt:String):Boolean=tlm.get().reset(txt).matches()
+            private val m= pmatcher(rx,"")
 
-        def hasPartialMatch(txt:String):Boolean=tlm.get().reset(txt).find()
+            def hasWholeMatch(txt:String):Boolean= m.reset(txt).matches()
 
-        inline private def submatches(m:M)={
-            if (m.groupCount()==0) {
-                Nil
-            } else {
-                (1 to m.groupCount()).map{i => (m.start(i),m.end(i))}
+            def hasPartialMatch(txt:String):Boolean= m.reset(txt).find()
+
+            inline private def submatches(m:M)={
+                if (m.groupCount()==0) {
+                    Nil
+                } else {
+                    (1 to m.groupCount()).map{i => (m.start(i),m.end(i))}
+                }
             }
-        }
 
-        private def findMatch(m:M)={
-            m.find() match {
-                case true => Some(Location(m.start(),m.end(),submatches(m)));
-                case false => None
+            private def findMatch(m:M)={
+                m.find() match {
+                    case true => Some(Location(m.start(),m.end(),submatches(m)));
+                    case false => None
+                }
             }
-        }
 
-        def locateFirstMatchIn(txt:String):Option[Location]={
-            findMatch(tlm.get().reset(txt))
-        }
+            def locateFirstMatchIn(txt:String):Option[Location]={
+                findMatch(m.reset(txt))
+            }
 
-        def locateAllMatchIn(txt:String):Iterator[Location]={
-            // Fresh matcher: the returned iterator retains it lazily, so it
-            // must not share the thread-local that the other methods reset.
-            val m=pmatcher(rx,txt)
-            Iterator.continually(findMatch(m)).takeWhile(_.isDefined).flatten
+            def locateAllMatchIn(txt:String):Iterator[Location]={
+                val mr=m.reset(txt)
+                Iterator.continually(findMatch(mr)).takeWhile(_.isDefined).flatten
+            }
         }
 
     }

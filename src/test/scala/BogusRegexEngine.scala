@@ -14,25 +14,28 @@ object Bogus extends RegexEngine {
 
         val engineName="Bogus"
 
-        /* whole string match */
-        def hasWholeMatch(txt:String):Boolean= (pattern.size+txt.size)%2==0
+        def matcher():Matcher= new Matcher {
 
-        /* partial match exists */
-        def hasPartialMatch(txt:String):Boolean=  (pattern.size+txt.size)%2==0
+            /* whole string match */
+            def hasWholeMatch(txt:String):Boolean= (pattern.size+txt.size)%2==0
 
-        def locateFirstMatchIn(txt:String):Option[Location]={
-            if ( (pattern.size+txt.size)%2==0){
-                None
-            } else {
-                Some(Location(0,0));
+            /* partial match exists */
+            def hasPartialMatch(txt:String):Boolean=  (pattern.size+txt.size)%2==0
+
+            def locateFirstMatchIn(txt:String):Option[Location]={
+                if ( (pattern.size+txt.size)%2==0){
+                    None
+                } else {
+                    Some(Location(0,0));
+                }
             }
-        }
 
-        def locateAllMatchIn(txt:String):Iterator[Location]={
-            if ( (pattern.size+txt.size)%2==0){
-                Iterator.empty;
-            } else {
-                (0 to txt.size).iterator.map{i=>Location(i,i)}
+            def locateAllMatchIn(txt:String):Iterator[Location]={
+                if ( (pattern.size+txt.size)%2==0){
+                    Iterator.empty;
+                } else {
+                    (0 to txt.size).iterator.map{i=>Location(i,i)}
+                }
             }
         }
 

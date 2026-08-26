@@ -16,23 +16,28 @@ object DkBrics extends RegexEngine {
 
             val engineName="DkBrics"
 
-            def hasWholeMatch(txt:String):Boolean=runAuto.run(txt)
+            // RunAutomaton is immutable/stateless, so the matcher just holds a
+            // reference to it; per-call state lives in the newMatcher() cursor.
+            def matcher():Matcher= new Matcher {
 
-            def hasPartialMatch(txt:String):Boolean=runAuto.newMatcher(txt).find();
+                def hasWholeMatch(txt:String):Boolean=runAuto.run(txt)
 
-            def locateFirstMatchIn(txt:String):Option[Location]={
-                val am = runAuto.newMatcher(txt)
-                am.find() match {
-                    case true => Some(Location(am.start, am.end))
-                    case false => None
-                }
-            }
+                def hasPartialMatch(txt:String):Boolean=runAuto.newMatcher(txt).find();
 
-            def locateAllMatchIn(txt:String):Iterator[Location]={
-                Iterator.unfold(runAuto.newMatcher(txt)){(ame) =>
-                    ame.find match {
-                        case true => Some((Location(ame.start,ame.end)),ame);
+                def locateFirstMatchIn(txt:String):Option[Location]={
+                    val am = runAuto.newMatcher(txt)
+                    am.find() match {
+                        case true => Some(Location(am.start, am.end))
                         case false => None
+                    }
+                }
+
+                def locateAllMatchIn(txt:String):Iterator[Location]={
+                    Iterator.unfold(runAuto.newMatcher(txt)){(ame) =>
+                        ame.find match {
+                            case true => Some((Location(ame.start,ame.end)),ame);
+                            case false => None
+                        }
                     }
                 }
             }

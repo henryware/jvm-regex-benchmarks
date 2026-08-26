@@ -177,79 +177,82 @@ object BricsScreen extends RegexEngine {
 
             val engineName="BricsTBA"
 
-            def hasWholeMatch(txt:String):Boolean=plain.run(txt)
-
-            // this was backwards (ie using rats.lazyNur) to avoid
-            // needing to compile 'star'.  That was unfair as the
-            // sample texts have the match at the end of a pile of
-            // noise and `rats` found it right away.
-            def hasPartialMatch(txt:String):Boolean=star.lazyRun(txt) >= 0;
-
             private val acceptsEmpty = auto.acceptsInitial // Check if the original automaton matches an empty string
 
+            def matcher():Matcher= new worldofregex.Matcher {
 
-            private def nextMatch(txt:String, start:Int=0, possibleStarts:List[Int])={
+                def hasWholeMatch(txt:String):Boolean=plain.run(txt)
 
-                val finish=plain.greedyRun(txt,start)
-                if (finish > -1) {
-                    Some(Location(start,finish))
-                } else {
-                    None
-                }
-            }
+                // this was backwards (ie using rats.lazyNur) to avoid
+                // needing to compile 'star'.  That was unfair as the
+                // sample texts have the match at the end of a pile of
+                // noise and `rats` found it right away.
+                def hasPartialMatch(txt:String):Boolean=star.lazyRun(txt) >= 0;
 
-            /* This may not be the best implementation because it is `O(N)` even
-             * when the match is right away.  But it's the right
-             * implementation _here_ because the unscreened
-             * implementation is used in DkBrics: no point in
-             * repeating that here.
-             *
-             * This does always scan the whole string which is not great.
-             */ 
-            def locateFirstMatchIn(txt:String):Option[Location]={
-                locateAllMatchIn(txt).nextOption()
-            }
+                private def nextMatch(txt:String, start:Int=0, possibleStarts:List[Int])={
 
-            def locateAllMatchIn(txt:String):Iterator[Location]={
-                val it=rats.fullNur(txt).iterator.buffered
-                var index=0;
-
-                @annotation.tailrec def findOne():Option[Location]={
-                    while (!it.isEmpty && it.head < index){
-                        it.next()
-                    }
-                    if (it.isEmpty){
-                        None
+                    val finish=plain.greedyRun(txt,start)
+                    if (finish > -1) {
+                        Some(Location(start,finish))
                     } else {
-                        val finish=plain.greedyRun(txt,it.head)
-                        if (finish>= 0) {
-                            index=math.max(finish,index+1)
-                            Some(Location(it.head, finish))
-                        } else {
-                            findOne()
-                        }
+                        None
                     }
                 }
 
-                new Iterator[Location]{
-                    var onDeck=findOne()
-                    var uptoDate=true
-                    def update()={
-                        if (!uptoDate){
-                            onDeck=findOne();
-                            uptoDate=true;
+                /* This may not be the best implementation because it is `O(N)` even
+                 * when the match is right away.  But it's the right
+                 * implementation _here_ because the unscreened
+                 * implementation is used in DkBrics: no point in
+                 * repeating that here.
+                 *
+                 * This does always scan the whole string which is not great.
+                 */
+                def locateFirstMatchIn(txt:String):Option[Location]={
+                    locateAllMatchIn(txt).nextOption()
+                }
+
+                def locateAllMatchIn(txt:String):Iterator[Location]={
+                    val it=rats.fullNur(txt).iterator.buffered
+                    var index=0;
+
+                    @annotation.tailrec def findOne():Option[Location]={
+                        while (!it.isEmpty && it.head < index){
+                            it.next()
+                        }
+                        if (it.isEmpty){
+                            None
+                        } else {
+                            val finish=plain.greedyRun(txt,it.head)
+                            if (finish>= 0) {
+                                index=math.max(finish,index+1)
+                                Some(Location(it.head, finish))
+                            } else {
+                                findOne()
+                            }
                         }
                     }
-                    override def hasNext= {
-                        update();
-                        onDeck.isDefined
+
+                    new Iterator[Location]{
+                        var onDeck=findOne()
+                        var uptoDate=true
+                        def update()={
+                            if (!uptoDate){
+                                onDeck=findOne();
+                                uptoDate=true;
+                            }
+                        }
+                        override def hasNext= {
+                            update();
+                            onDeck.isDefined
+                        }
+                        override def next={
+                            update();
+                            val ret=onDeck.get;
+                            uptoDate=false;
+                            ret;
+                        }
                     }
-                    override def next={
-                        update();
-                        val ret=onDeck.get;
-                        uptoDate=false;
-                        ret;
-                    }
+
                 }
 
             }
