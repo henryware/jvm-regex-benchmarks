@@ -112,7 +112,8 @@ The libraries are widely used C/C++ libraries called via the JVM's FFI.
 - [**Needle**](https://github.com/hyperpape/needle) MIT.  DFA with
   Perl style ambiguity resolution.  Still under construction, but
   basic functionality implemented and working.  Superpower: compiles
-  the regex to JVM bytecode at either run time or build time.
+  the regex to JVM bytecode at either run time or build time.  A Scala
+  macro to do this at compile time is in macros/Needle.scala
 
 - [**Pcre2FFI**](https://github.com/PCRE2Project/pcre2) BSD-ish
   license.  Backtracking NFA.  Requires library.  Perl Compatable RE
