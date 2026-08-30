@@ -23,13 +23,16 @@ package worldofregex {
 
             val skipSet=skipThese.toSet
 
+            // Labels initialise the middle tokens in place so each maps
+            // positionally to its benchmark page: "Match P A hit" <-
+            // "Match Phone Ascii Hit".  P = Phone, A = Ascii, C = Cjk.
             val perEngineVariants = List(
-                "Match_Phone_Ascii_Hit"   -> "Match A hit",
-                "Match_Phone_Ascii_Miss"  -> "Match A miss",
-                "Locate_Phone_Ascii_Hit"  -> "Loc A hit",
-                "Locate_Phone_Ascii_Miss" -> "Loc A miss",
-                "Match_Phone_Cjk_Hit"     -> "Match U hit",
-                "Match_Phone_Cjk_Miss"    -> "Match U miss"
+                "Match_Phone_Ascii_Hit"   -> "Match P A hit",
+                "Match_Phone_Ascii_Miss"  -> "Match P A miss",
+                "Locate_Phone_Ascii_Hit"  -> "Locate P A hit",
+                "Locate_Phone_Ascii_Miss" -> "Locate P A miss",
+                "Match_Phone_Cjk_Hit"     -> "Match P C hit",
+                "Match_Phone_Cjk_Miss"    -> "Match P C miss"
             )
             val perEngineBenchSet = perEngineVariants.map(_._1).toSet
 
@@ -48,6 +51,24 @@ package worldofregex {
                 java.time.Instant.ofEpochMilli(mtime)
                     .atZone(java.time.ZoneId.systemDefault())
                     .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            }
+            // Host that generated these plots (same machine as the run, in the
+            // normal workflow).  InetAddress can throw when the local name is
+            // unresolvable, so fall back through env / `hostname` / /etc/hostname.
+            val hostName: String = {
+                def fromInet = try Some(java.net.InetAddress.getLocalHost.getHostName) catch { case _: Throwable => None }
+                def fromEnv  = Option(System.getenv("HOSTNAME")).orElse(Option(System.getenv("COMPUTERNAME")))
+                def fromCmd  = try {
+                    val p = new ProcessBuilder("hostname").redirectErrorStream(true).start()
+                    val out = scala.io.Source.fromInputStream(p.getInputStream).mkString.trim
+                    p.waitFor(); if out.nonEmpty then Some(out) else None
+                } catch { case _: Throwable => None }
+                def fromFile = try {
+                    val s = scala.io.Source.fromFile("/etc/hostname").mkString.trim
+                    if s.nonEmpty then Some(s) else None
+                } catch { case _: Throwable => None }
+                fromInet.orElse(fromEnv).orElse(fromCmd).orElse(fromFile)
+                    .map(_.trim).filter(_.nonEmpty).getOrElse("unknown")
             }
             val zName2Rows=
                 benchmarks.filter(r => r("Mode")=="thrpt"  && r("Score").toDouble>0 && !skipSet.contains(r("Param: factoryName"))).
@@ -233,7 +254,7 @@ package worldofregex {
                             .map { case (i, s) => val len = 1 << i; (len, len.toDouble * s) }
                         (label, xys)
                     }.filter(_._2.nonEmpty)
-                val customTitle = s"""<b>$engine</b>${versionSpan(engine)}<br>Phone-number throughput: {success|fail} × {match|locate}<br><span style="font-size:smaller">higher is better</span>"""
+                val customTitle = s"""<b>$engine</b>${versionSpan(engine)}<br>Phone-number throughput: {Match|Locate} × {hit|miss}<br><span style="font-size:smaller">P = Phone, A = Ascii, C = Cjk corpus &middot; higher is better</span>"""
                 writeToFile(s"plots/Engine_$engine.html",
                     html(s"Engine_$engine", variantTraces,
                          xaxis = "Data Length (chars)",
@@ -337,7 +358,7 @@ package worldofregex {
                     s"""<tr><th class="rowhead"><a href="Engine_${engine}.html">${engine}</a></th>$cells</tr>"""
                 }.mkString
                 s"""<h2>Phone-Number Scorecard</h2>
-                |<p class="hint">Throughput at each engine's largest measured input. Cells are color-coded by column (log scale: darker = faster). Click an engine to see its full {match|locate} × {success|fail} chart.</p>
+                |<p class="hint">Throughput at each engine's largest measured input. Columns: P = Phone, A = Ascii, C = Cjk corpus (e.g. "Match P A hit" = Match Phone Ascii Hit). Cells are color-coded by column (log scale: darker = faster). Click an engine to see its full {match|locate} × {success|fail} chart.</p>
                 |<table class="scorecard">
                 |<thead><tr><th>Engine</th>$headerCells</tr></thead>
                 |<tbody>$rows</tbody>
@@ -396,7 +417,7 @@ package worldofregex {
             |<body>
             |<h1>JVM Regex Benchmarks</h1>
             |<p>Throughput and latency comparison across JVM-accessible regex engines. Benchmark code at <a href="https://github.com/henryware/jvm-regex-benchmarks">github.com/henryware/jvm-regex-benchmarks</a>.</p>
-            |<p class="hint">Results from benchmark run on <b>${runDate}</b>.</p>
+            |<p class="hint">Results from benchmark run on <b>${runDate}</b> on host <b>${hostName}</b>.</p>
             |$winnersHtml
             |$scorecardHtml
             |$benchListHtml
