@@ -156,7 +156,7 @@ class Sanity extends ScalaCheckSuite {
      * Joni, but everybody needs to work with UTF-16.
      *
      *  broken out because KMY doesn't support surrogate pairs for the
-     *  obvious reason that Java did have them back then.
+     *  obvious reason that Java didn't have them back then.
      */
     val utfTestCases = List(
         TestCase("😂", "éa😂a😂a𝄞€4é", whole="false",partial="true",first="Some((2,4))",all="(2,4),(5,7)"),
