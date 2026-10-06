@@ -1,5 +1,5 @@
 //> using jvm 25
-//> using scala 3.8.4
+//> using scala 3.9.0
 
 
 // turn off scary warnings reguarding lazy vals
@@ -110,7 +110,7 @@
 
 // lets use what the dependencies dragged in //> using dep org.scalacheck::scalacheck:1.19.0
 
-//> using test.dep org.scalameta::munit::1.3.5
-//> using test.dep org.scalameta::munit-scalacheck::1.3.0
+//> using test.dep org.scalameta::munit::1.3.6
+//> using test.dep org.scalameta::munit-scalacheck::1.3.1
 
 //> using dep io.github.martinhh::scalacheck-derived:0.10.0

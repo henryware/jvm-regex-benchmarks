@@ -164,16 +164,15 @@ package worldofregex {
                 val traces={
                     for (case (engine,xys) <- engine2XYs) yield {
                         val (xs, ys)=xys.unzip
-                        plotly.Scatter(xs,ys,name=engine)
+                        plotly.Scatter().withX(xs).withY(ys).withName(engine)
                     }
                 }.toSeq
 
-                val layout = Layout(
-                    title = customTitle.getOrElse(title(lastSegment(name))),
-                    height = 800,
-                    xaxis = Axis(title = xaxis, `type` = AxisType.Log),
-                    yaxis = Axis(title = yaxis, `type` = AxisType.Log)
-                )
+                val layout = Layout()
+                    .withTitle(customTitle.getOrElse(title(lastSegment(name))))
+                    .withHeight(800)
+                    .withXaxis(Axis().withTitle(xaxis).withType(AxisType.Log))
+                    .withYaxis(Axis().withTitle(yaxis).withType(AxisType.Log))
 
                 val divId = "chart";
 
